@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoboCup Junior Queensland — Get Involved</title>
+    <meta name="description" content="Discover RoboCup Junior Queensland: school robotics competitions, workshops, volunteering and upcoming events across QLD. Everyone starts somewhere — start here.">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <meta property="og:title" content="RoboCup Junior Queensland — Get Involved">
+    <meta property="og:description" content="Robots that play soccer, run rescue missions and perform on stage — built by Queensland students. Find events, volunteer, and join in.">
+    <meta property="og:image" content="https://margauxmedwards.github.io/robocup-qld/homeimage.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --navy: #192f59;
+            --navy-deep: #101f3d;
+            --green: #9dbd38;
+            --green-bright: #b5d84a;
+            --white: #ffffff;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: 'Outfit', 'Helvetica Neue', Arial, sans-serif;
+            color: var(--white);
+            background: var(--navy-deep);
+            background-image:
+                linear-gradient(rgba(16, 31, 61, 0.86), rgba(25, 47, 89, 0.92)),
+                url("homeimage.jpg");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        .page {
+            max-width: 660px;
+            margin: 0 auto;
+            padding: 40px 18px 30px;
+        }
+
+        /* ---------- Hero ---------- */
+        .hero { text-align: center; padding: 10px 0 6px; }
+
+        .hero .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(157, 189, 56, 0.16);
+            border: 1px solid rgba(157, 189, 56, 0.55);
+            color: var(--green-bright);
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 6px 16px;
+            border-radius: 999px;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.1rem, 6.5vw, 3rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin: 18px 0 12px;
+        }
+
+        .hero h1 .ql { color: var(--green-bright); }
+
+        .hero .tagline {
+            font-size: clamp(1.02rem, 3vw, 1.15rem);
+            line-height: 1.55;
+            color: rgba(255, 255, 255, 0.88);
+            max-width: 540px;
+            margin: 0 auto;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 26px 0 8px;
+        }
+
+        .stat {
+            flex: 1;
+            min-width: 150px;
+            max-width: 200px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 14px;
+            padding: 14px 10px;
+            backdrop-filter: blur(4px);
+        }
+
+        .stat .num {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--green-bright);
+        }
+
+        .stat .lbl {
+            font-size: 0.82rem;
+            color: rgba(255, 255, 255, 0.75);
+        }
+
+        /* ---------- Section headings ---------- */
+        .section { margin-top: 40px; }
+
+        .section > h2 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin: 0 0 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section > .sub {
+            margin: 0 0 16px;
+            color: rgba(255, 255, 255, 0.65);
+            font-size: 0.92rem;
+        }
+
+        /* ---------- Events ---------- */
+        .event-list { display: flex; flex-direction: column; gap: 12px; }
+
+        .event-card {
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            background: var(--white);
+            color: #222;
+            border-radius: 14px;
+            padding: 14px 16px;
+            text-decoration: none;
+            border-left: 6px solid var(--green);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .event-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+        }
+
+        .event-card.highlight {
+            background: var(--navy);
+            color: var(--white);
+            border-left-color: var(--green-bright);
+        }
+
+        .event-date {
+            flex-shrink: 0;
+            text-align: center;
+            background: rgba(157, 189, 56, 0.15);
+            color: var(--navy);
+            border-radius: 10px;
+            padding: 8px 10px;
+            min-width: 64px;
+        }
+
+        .event-card.highlight .event-date {
+            background: rgba(255, 255, 255, 0.12);
+            color: var(--green-bright);
+        }
+
+        .event-date .d { display: block; font-size: 1.25rem; font-weight: 800; line-height: 1.1; }
+        .event-date .m { display: block; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+
+        .event-info { min-width: 0; }
+
+        .event-name { font-weight: 700; font-size: 1.02rem; line-height: 1.3; }
+
+        .event-venue {
+            font-size: 0.86rem;
+            color: #666;
+            margin-top: 3px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .event-card.highlight .event-venue { color: rgba(255, 255, 255, 0.8); }
+
+        .event-meta { margin-top: 7px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+        .pill {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 3px 10px;
+            border-radius: 999px;
+        }
+
+        .pill.workshop { background: #e7f0fb; color: #1a5fa8; }
+        .pill.competition { background: #fdeee4; color: #c0561b; }
+        .pill.open { background: rgba(157, 189, 56, 0.22); color: #5b7413; }
+        .event-card.highlight .pill.open { color: var(--green-bright); }
+
+        .events-note {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px dashed rgba(255, 255, 255, 0.25);
+            border-radius: 14px;
+            padding: 22px 16px;
+            font-size: 0.95rem;
+        }
+
+        .events-note a { color: var(--green-bright); font-weight: 600; }
+
+        .see-all {
+            display: block;
+            text-align: center;
+            margin-top: 14px;
+            color: var(--green-bright);
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .see-all:hover { text-decoration: underline; }
+
+        /* ---------- Link stack ---------- */
+        .links { display: flex; flex-direction: column; gap: 12px; }
+
+        .link-btn {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-radius: 16px;
+            padding: 16px 18px;
+            color: var(--white);
+            text-decoration: none;
+            transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+            backdrop-filter: blur(4px);
+        }
+
+        .link-btn:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(157, 189, 56, 0.7);
+        }
+
+        .link-btn.primary {
+            background: var(--green);
+            border-color: var(--green);
+            color: var(--navy);
+        }
+
+        .link-btn.primary:hover { background: var(--green-bright); border-color: var(--green-bright); }
+
+        .link-btn .ico {
+            flex-shrink: 0;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+        }
+
+        .link-btn.primary .ico { background: rgba(25, 47, 89, 0.12); }
+
+        .link-btn .txt { min-width: 0; }
+        .link-btn .txt strong { display: block; font-size: 1.05rem; font-weight: 700; }
+        .link-btn .txt span { font-size: 0.86rem; opacity: 0.78; }
+
+        .link-btn .arrow { margin-left: auto; font-size: 1.1rem; opacity: 0.6; }
+
+        /* ---------- Challenges ---------- */
+        .challenges {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        @media (min-width: 560px) {
+            .challenges { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        .challenge {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 14px;
+            padding: 16px 14px;
+            backdrop-filter: blur(4px);
+        }
+
+        .challenge .emoji { font-size: 1.7rem; display: block; margin-bottom: 8px; }
+        .challenge strong { display: block; font-size: 0.98rem; margin-bottom: 4px; color: var(--green-bright); }
+        .challenge span { font-size: 0.84rem; color: rgba(255, 255, 255, 0.78); line-height: 1.45; }
+
+        .who-box {
+            margin-top: 16px;
+            background: rgba(157, 189, 56, 0.1);
+            border: 1px solid rgba(157, 189, 56, 0.4);
+            border-radius: 14px;
+            padding: 16px 18px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .who-box strong { color: var(--green-bright); }
+
+        /* ---------- Socials / footer ---------- */
+        .socials {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            margin-top: 8px;
+        }
+
+        .socials a {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s ease, transform 0.15s ease;
+        }
+
+        .socials a:hover { background: rgba(157, 189, 56, 0.3); transform: translateY(-2px); }
+        .socials svg { width: 22px; height: 22px; fill: var(--white); }
+
+        .contact {
+            text-align: center;
+            margin-top: 18px;
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .contact a { color: var(--green-bright); text-decoration: none; font-weight: 600; }
+        .contact a:hover { text-decoration: underline; }
+
+        footer {
+            margin-top: 44px;
+            padding-top: 18px;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            text-align: center;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            line-height: 1.7;
+        }
+
+        footer a { color: rgba(255, 255, 255, 0.7); }
+
+        @media (max-width: 480px) {
+            .page { padding: 28px 14px 24px; }
+            .stat { min-width: 100px; padding: 12px 8px; }
+            .stat .num { font-size: 1.25rem; }
+            .link-btn { padding: 14px 14px; gap: 12px; }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+
+    <!-- ============ HERO ============ -->
+    <header class="hero">
+        <span class="badge">🤖 Est. worldwide · Big in Queensland</span>
+        <h1>RoboCup Junior <span class="ql">Queensland</span></h1>
+        <p class="tagline">
+            Robots that play soccer, run rescue missions and perform on stage —
+            designed, built and programmed by Queensland school students.
+            No experience needed. Everyone starts somewhere: start here.
+        </p>
+
+        <div class="stats" aria-label="RoboCup Junior Queensland quick facts">
+            <div class="stat"><span class="num">1,000+</span><span class="lbl">QLD students every year</span></div>
+            <div class="stat"><span class="num">6</span><span class="lbl">challenges to choose from</span></div>
+            <div class="stat"><span class="num">Open</span><span class="lbl">entry — no qualification needed</span></div>
+        </div>
+    </header>
+
+    <!-- ============ UPCOMING EVENTS ============ -->
+    <section class="section" id="events">
+        <h2>📅 Next up in Queensland</h2>
+        <p class="sub">Live from the RCJA entry system — workshops and competitions you can join right now.</p>
+        <div class="event-list" id="event-list">
+            <div class="events-note">Loading upcoming events…</div>
+        </div>
+        <a class="see-all" href="https://margauxmedwards.github.io/rcja-calendar/QLD/" target="_blank" rel="noopener">
+            See every QLD event on the full calendar →
+        </a>
+    </section>
+
+    <!-- ============ LINKS ============ -->
+    <section class="section" id="get-involved">
+        <h2>🚀 Get involved</h2>
+        <p class="sub">Everything RoboCup Queensland, one tap away.</p>
+        <nav class="links">
+            <a class="link-btn primary" href="https://forms.cloud.microsoft/pages/responsepage.aspx?id=uTxxKsDrzk29b_HiSUcnPKm_GQCvWPNMqwn9lNNYh3lUNFMzRzdIQkZERFhIMVA5TVFEWlFOWkcxVC4u&route=shorturl" target="_blank" rel="noopener">
+                <span class="ico">🙋</span>
+                <span class="txt">
+                    <strong>Volunteer with us</strong>
+                    <span>Referees, judges, helpers — no robotics experience required</span>
+                </span>
+                <span class="arrow">→</span>
+            </a>
+            <a class="link-btn" href="https://margauxmedwards.github.io/rcja-calendar/QLD/" target="_blank" rel="noopener">
+                <span class="ico">📅</span>
+                <span class="txt">
+                    <strong>QLD events calendar</strong>
+                    <span>Every workshop and competition, region by region</span>
+                </span>
+                <span class="arrow">→</span>
+            </a>
+            <a class="link-btn" href="https://enter.robocupjunior.org.au/" target="_blank" rel="noopener">
+                <span class="ico">🤖</span>
+                <span class="txt">
+                    <strong>Register a team</strong>
+                    <span>Schools &amp; community teams — all events are open entry</span>
+                </span>
+                <span class="arrow">→</span>
+            </a>
+            <a class="link-btn" href="https://margauxmedwards.github.io/rcja-calendar/sync/" target="_blank" rel="noopener">
+                <span class="ico">🔄</span>
+                <span class="txt">
+                    <strong>Sync events to your calendar</strong>
+                    <span>Subscribe once, never miss a rego deadline</span>
+                </span>
+                <span class="arrow">→</span>
+            </a>
+            <a class="link-btn" href="https://mailchi.mp/robocupjunior/htymhq5v1u" target="_blank" rel="noopener">
+                <span class="ico">✉️</span>
+                <span class="txt">
+                    <strong>Join the mailing list</strong>
+                    <span>Season news and event announcements in your inbox</span>
+                </span>
+                <span class="arrow">→</span>
+            </a>
+            <a class="link-btn" href="https://www.robocupjunior.org.au/challenge-regions/qld/" target="_blank" rel="noopener">
+                <span class="ico">🌐</span>
+                <span class="txt">
+                    <strong>Official RCJQ website</strong>
+                    <span>Rules, policies and the full story on robocupjunior.org.au</span>
+                </span>
+                <span class="arrow">→</span>
+            </a>
+        </nav>
+    </section>
+
+    <!-- ============ NEW TO ROBOCUP ============ -->
+    <section class="section" id="what-is-robocup">
+        <h2>✨ New to RoboCup?</h2>
+        <p class="sub">
+            RoboCup Junior is the world's largest robotics program for school students.
+            Pick a challenge, build a robot, and take it to an event near you.
+        </p>
+        <div class="challenges">
+            <div class="challenge">
+                <span class="emoji">⚽</span>
+                <strong>Soccer</strong>
+                <span>Autonomous robots chase an infrared ball in fast 2-on-2 matches.</span>
+            </div>
+            <div class="challenge">
+                <span class="emoji">🛟</span>
+                <strong>Rescue Line</strong>
+                <span>Follow the line, dodge obstacles and rescue victims from the danger zone.</span>
+            </div>
+            <div class="challenge">
+                <span class="emoji">🧭</span>
+                <strong>Rescue Maze</strong>
+                <span>Map an unknown maze and find victims — no line to guide you.</span>
+            </div>
+            <div class="challenge">
+                <span class="emoji">🎭</span>
+                <strong>OnStage</strong>
+                <span>Robot theatre! Choreograph a performance with robots as the stars.</span>
+            </div>
+            <div class="challenge">
+                <span class="emoji">🥋</span>
+                <strong>Sumo</strong>
+                <span>The beginner-friendly entry league — push your opponent out of the ring.</span>
+            </div>
+            <div class="challenge">
+                <span class="emoji">🧱</span>
+                <strong>SPIKE Prime Challenge</strong>
+                <span>A virtual challenge built around the LEGO SPIKE Prime platform.</span>
+            </div>
+        </div>
+        <div class="who-box">
+            <strong>Who can join?</strong> School-aged students from primary to Year 12, in school or
+            community teams. Any platform is welcome — LEGO, micro:bit, Arduino or fully custom builds —
+            and regional events are a friendly place to start before State and Nationals.
+        </div>
+    </section>
+
+    <!-- ============ SOCIALS ============ -->
+    <section class="section" id="contact" style="text-align: center;">
+        <h2 style="justify-content: center;">💬 Say hello</h2>
+        <div class="socials">
+            <a href="https://www.facebook.com/RoboCupJuniorQld/" target="_blank" rel="noopener" aria-label="RoboCup Junior QLD on Facebook">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5.02 3.66 9.18 8.44 9.94v-7.03H7.9v-2.9h2.54V9.85c0-2.52 1.5-3.91 3.78-3.91 1.09 0 2.24.2 2.24.2v2.47H15.2c-1.24 0-1.63.77-1.63 1.57v1.88h2.78l-.45 2.9h-2.33V22c4.78-.76 8.43-4.92 8.43-9.94Z"/></svg>
+            </a>
+            <a href="https://www.instagram.com/robocupjunior.qld/" target="_blank" rel="noopener" aria-label="RoboCup Junior QLD on Instagram">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.72 3.72 0 0 1-1.38-.9c-.42-.42-.68-.82-.9-1.38-.16-.42-.36-1.06-.41-2.23-.06-1.27-.07-1.65-.07-4.85s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41 1.27-.06 1.65-.07 4.85-.07M12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63a5.88 5.88 0 0 0-2.13 1.38A5.88 5.88 0 0 0 .63 4.14C.33 4.9.13 5.78.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.15.56 2.91.3.79.72 1.46 1.38 2.13a5.88 5.88 0 0 0 2.13 1.38c.76.3 1.64.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.27-.06 2.15-.26 2.91-.56a5.88 5.88 0 0 0 2.13-1.38 5.88 5.88 0 0 0 1.38-2.13c.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.15-.56-2.91a5.88 5.88 0 0 0-1.38-2.13A5.88 5.88 0 0 0 19.86.63c-.76-.3-1.64-.5-2.91-.56C15.67.01 15.26 0 12 0Zm0 5.84A6.16 6.16 0 1 0 18.16 12 6.16 6.16 0 0 0 12 5.84ZM12 16a4 4 0 1 1 4-4 4 4 0 0 1-4 4Zm7.85-10.4a1.44 1.44 0 1 1-1.44-1.44 1.44 1.44 0 0 1 1.44 1.44Z"/></svg>
+            </a>
+            <a href="https://www.linkedin.com/company/robocupjuniorqld" target="_blank" rel="noopener" aria-label="RoboCup Junior QLD on LinkedIn">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.42v1.56h.05a3.75 3.75 0 0 1 3.37-1.85c3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13Zm1.78 13.02H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.72v20.55C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.72C24 .77 23.2 0 22.22 0Z"/></svg>
+            </a>
+        </div>
+        <p class="contact">
+            Questions? Email <a href="mailto:qld@robocupjunior.org.au">qld@robocupjunior.org.au</a> —
+            we're a friendly bunch of volunteers.
+        </p>
+    </section>
+
+    <footer>
+        Community page maintained by RoboCup Junior Queensland volunteers.<br>
+        Event data updates daily from the
+        <a href="https://enter.robocupjunior.org.au/" target="_blank" rel="noopener">RCJA Entry System</a> ·
+        Part of <a href="https://www.robocupjunior.org.au/" target="_blank" rel="noopener">RoboCup Junior Australia</a>.
+    </footer>
+</div>
+
+<script>
+    // Live upcoming events, reusing the daily-refreshed feeds published by the
+    // rcja-calendar GitHub Pages site (same github.io origin once deployed).
+    const DATA_BASE = "https://margauxmedwards.github.io/rcja-calendar/data";
+    const MAX_EVENTS = 5;
+
+    function esc(str) {
+        return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;");
+    }
+
+    function venueLabel(venue) {
+        if (!venue) return "Venue TBC";
+        const parts = [venue.name, venue.address].filter(p => p && String(p).trim());
+        return parts.length ? parts.join(", ") : "Venue TBC";
+    }
+
+    // Date badge: "18 FEB", or "2–4 OCT" for multi-day events in the same month.
+    function dateBadge(startStr, endStr) {
+        const s = new Date(startStr);
+        const month = s.toLocaleDateString("en-AU", { month: "short" });
+        let day = String(s.getDate());
+        if (endStr && endStr !== startStr) {
+            const e = new Date(endStr);
+            day = (s.getMonth() === e.getMonth())
+                ? `${s.getDate()}–${e.getDate()}`
+                : `${s.getDate()} ${month.toUpperCase()}–${e.getDate()} ${e.toLocaleDateString("en-AU", { month: "short" }).toUpperCase()}`;
+            if (s.getMonth() !== e.getMonth()) return { d: day, m: "" };
+        }
+        return { d: day, m: month.toUpperCase() };
+    }
+
+    function regoPill(evt, today) {
+        const open = evt.registrationsOpenDate ? new Date(evt.registrationsOpenDate) : null;
+        const close = evt.registrationsCloseDate ? new Date(evt.registrationsCloseDate) : null;
+        if (open && close && today >= open && today <= close) {
+            return '<span class="pill open">Rego open</span>';
+        }
+        if (open && today < open) {
+            const d = open.toLocaleDateString("en-AU", { day: "numeric", month: "short" });
+            return `<span class="pill open">Rego opens ${esc(d)}</span>`;
+        }
+        return "";
+    }
+
+    function render(events) {
+        const list = document.getElementById("event-list");
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const upcoming = events
+            .filter(e => {
+                const end = new Date(e.endDate || e.startDate);
+                return end >= today;
+            })
+            .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
+            .slice(0, MAX_EVENTS);
+
+        if (!upcoming.length) {
+            list.innerHTML = `
+                <div class="events-note">
+                    Between seasons right now — new events land on the
+                    <a href="https://margauxmedwards.github.io/rcja-calendar/QLD/" target="_blank" rel="noopener">QLD calendar</a> first.
+                </div>`;
+            return;
+        }
+
+        list.innerHTML = upcoming.map(evt => {
+            const badge = dateBadge(evt.startDate, evt.endDate);
+            const name = evt.name || "Untitled event";
+            const isBig = /state|national/i.test(name);
+            const type = (evt.eventType === "workshop")
+                ? '<span class="pill workshop">Workshop</span>'
+                : '<span class="pill competition">Competition</span>';
+            const url = evt.registrationURL || "https://margauxmedwards.github.io/rcja-calendar/QLD/";
+            return `
+                <a class="event-card${isBig ? " highlight" : ""}" href="${esc(url)}" target="_blank" rel="noopener">
+                    <span class="event-date"><span class="d">${esc(badge.d)}</span><span class="m">${esc(badge.m)}</span></span>
+                    <span class="event-info">
+                        <span class="event-name">${isBig ? "🏆 " : ""}${esc(name)}</span>
+                        <span class="event-venue">${esc(venueLabel(evt.venue))}</span>
+                        <span class="event-meta">${type}${regoPill(evt, today)}</span>
+                    </span>
+                </a>`;
+        }).join("");
+    }
+
+    function showFallback() {
+        document.getElementById("event-list").innerHTML = `
+            <div class="events-note">
+                Couldn't load live events just now — the full list is always on the
+                <a href="https://margauxmedwards.github.io/rcja-calendar/QLD/" target="_blank" rel="noopener">QLD events calendar</a>.
+            </div>`;
+    }
+
+    // QLD feed plus national-level events (deduplicated by id), matching how
+    // the calendar's QLD page combines the two.
+    Promise.all([
+        fetch(`${DATA_BASE}/qld-events.json`).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }),
+        fetch(`${DATA_BASE}/nat-events.json`).then(r => r.ok ? r.json() : [])
+    ])
+        .then(([qld, nat]) => {
+            const seen = new Set(qld.map(e => e.id));
+            render(qld.concat(nat.filter(e => !seen.has(e.id))));
+        })
+        .catch(err => {
+            console.error("Event feed failed:", err);
+            showFallback();
+        });
+</script>
+</body>
+</html>
