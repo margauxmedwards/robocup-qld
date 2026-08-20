@@ -1,0 +1,382 @@
+<!--
+  ============================================================================
+  RCJQ IN THE MEDIA — self-updating WordPress block
+  ============================================================================
+  Paste this whole file into a Custom HTML block (or a Kingster/GoodLayers
+  "Text Box" element switched to HTML mode) on robocupjunior.org.au.
+
+  It reads published posts straight from this site's own REST API, so the list
+  updates itself every time someone publishes a new QLD post — nothing to edit
+  here when a new post goes up.
+
+  To change what it shows, edit the CONFIG block near the bottom of this file.
+
+  If your editor strips <script> tags, use rcjq-in-the-media-static.html
+  instead (same design, no JavaScript, posts baked in).
+  ============================================================================
+-->
+<section class="rcjq-media" aria-labelledby="rcjq-media-title">
+    <header class="rcjq-media__head">
+        <span class="rcjq-media__kicker">Latest updates</span>
+        <h2 class="rcjq-media__title" id="rcjq-media-title">RCJQ in the media</h2>
+        <p class="rcjq-media__sub">
+            Announcements, information packs and season news from RoboCup Junior Queensland.
+        </p>
+    </header>
+
+    <div class="rcjq-media__grid" id="rcjq-media-grid">
+        <p class="rcjq-media__note">Loading the latest RCJQ posts&hellip;</p>
+    </div>
+
+    <a class="rcjq-media__all" href="/category/qld/">
+        See every Queensland post &rarr;
+    </a>
+</section>
+
+<style>
+/* All selectors are namespaced under .rcjq-media so nothing here can leak into
+   the Kingster theme's own styles (or pick up styles from it). */
+.rcjq-media {
+    --rcjq-navy: #192f59;
+    --rcjq-navy-deep: #101f3d;
+    --rcjq-green: #9dbd38;
+    --rcjq-green-bright: #b5d84a;
+    --rcjq-green-dark: #5b7413;
+    --rcjq-ink: #24292f;
+    --rcjq-muted: #5b6470;
+    --rcjq-line: #e4e8ee;
+
+    box-sizing: border-box;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 8px 0 4px;
+    font-family: 'Outfit', 'Helvetica Neue', Arial, sans-serif;
+    color: var(--rcjq-ink);
+    text-align: left;
+}
+
+.rcjq-media *,
+.rcjq-media *::before,
+.rcjq-media *::after { box-sizing: border-box; }
+
+/* ---------- Heading ---------- */
+.rcjq-media__head { margin-bottom: 20px; }
+
+.rcjq-media__kicker {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--rcjq-green-dark);
+    margin-bottom: 6px;
+}
+
+.rcjq-media h2.rcjq-media__title {
+    margin: 0 0 8px;
+    padding: 0;
+    font-size: clamp(1.4rem, 3.4vw, 1.9rem);
+    font-weight: 800;
+    line-height: 1.2;
+    color: var(--rcjq-navy);
+    text-transform: none;
+}
+
+.rcjq-media p.rcjq-media__sub {
+    margin: 0;
+    max-width: 620px;
+    font-size: 0.98rem;
+    line-height: 1.6;
+    color: var(--rcjq-muted);
+}
+
+/* ---------- Grid ---------- */
+.rcjq-media__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(255px, 1fr));
+    gap: 18px;
+}
+
+/* ---------- Card ---------- */
+.rcjq-media a.rcjq-media__card {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 1px solid var(--rcjq-line);
+    border-radius: 14px;
+    overflow: hidden;
+    text-decoration: none !important;
+    color: var(--rcjq-ink);
+    box-shadow: 0 2px 10px rgba(16, 31, 61, 0.06);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.rcjq-media a.rcjq-media__card:hover,
+.rcjq-media a.rcjq-media__card:focus-visible {
+    transform: translateY(-3px);
+    border-color: var(--rcjq-green);
+    box-shadow: 0 10px 24px rgba(16, 31, 61, 0.14);
+}
+
+.rcjq-media__thumb {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    margin: 0;
+    background: rgba(25, 47, 89, 0.07);
+}
+
+/* Shown when a post has no featured image. */
+.rcjq-media__thumb--empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--rcjq-navy), var(--rcjq-navy-deep));
+    color: var(--rcjq-green-bright);
+    font-size: 0.95rem;
+    font-weight: 800;
+    letter-spacing: 3px;
+}
+
+.rcjq-media__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    padding: 15px 17px 17px;
+}
+
+.rcjq-media__meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+
+.rcjq-media__date {
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: var(--rcjq-muted);
+}
+
+.rcjq-media__pill {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: rgba(25, 47, 89, 0.08);
+    color: var(--rcjq-navy);
+}
+
+.rcjq-media__pill--event { background: #fdeee4; color: #c0561b; }
+.rcjq-media__pill--workshop { background: #e7f0fb; color: #1a5fa8; }
+.rcjq-media__pill--news { background: rgba(157, 189, 56, 0.2); color: var(--rcjq-green-dark); }
+.rcjq-media__pill--resource { background: #f0ecfb; color: #5b3fa8; }
+
+.rcjq-media__name {
+    display: block;
+    margin: 0 0 7px;
+    font-size: 1.02rem;
+    font-weight: 700;
+    line-height: 1.35;
+    color: var(--rcjq-navy);
+}
+
+.rcjq-media__excerpt {
+    margin: 0;
+    font-size: 0.88rem;
+    line-height: 1.55;
+    color: var(--rcjq-muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.rcjq-media__read {
+    margin-top: 12px;
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--rcjq-green-dark);
+}
+
+/* ---------- Loading / fallback note ---------- */
+.rcjq-media p.rcjq-media__note {
+    grid-column: 1 / -1;
+    margin: 0;
+    padding: 22px 18px;
+    text-align: center;
+    font-size: 0.95rem;
+    color: var(--rcjq-muted);
+    background: rgba(25, 47, 89, 0.03);
+    border: 1px dashed var(--rcjq-line);
+    border-radius: 14px;
+}
+
+.rcjq-media p.rcjq-media__note a {
+    color: var(--rcjq-green-dark);
+    font-weight: 700;
+}
+
+/* ---------- Footer link ---------- */
+.rcjq-media a.rcjq-media__all {
+    display: inline-block;
+    margin-top: 18px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--rcjq-green-dark);
+    text-decoration: none !important;
+}
+
+.rcjq-media a.rcjq-media__all:hover { text-decoration: underline !important; }
+
+@media (max-width: 480px) {
+    .rcjq-media__grid { grid-template-columns: 1fr; gap: 14px; }
+}
+</style>
+
+<script>
+(function () {
+    "use strict";
+
+    /* ======================= CONFIG — edit these ======================= */
+    var CONFIG = {
+        // Category to pull posts from. 80 = QLD.
+        // Swap to 87 to show only posts filed under "In The Media" instead.
+        category: 80,
+        // How many cards to show.
+        limit: 6,
+        // Post IDs to skip (e.g. evergreen pages that aren't really news).
+        // 20692 = "RoboCup Junior Queensland Sumo Competition".
+        exclude: [20692],
+        // Where the "see every post" link goes.
+        archive: "/category/qld/"
+    };
+    /* ================================================================== */
+
+    // Category ID -> pill label. First match wins, so order matters.
+    var PILLS = [
+        [88, "Event", "event"],
+        [89, "Workshop", "workshop"],
+        [86, "News", "news"],
+        [90, "Resources", "resource"],
+        [2, "News", "news"]
+    ];
+
+    var grid = document.getElementById("rcjq-media-grid");
+    if (!grid) return;
+
+    function esc(str) {
+        return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;");
+    }
+
+    // WP returns rendered HTML with entities; decode to plain text, then we
+    // re-escape it ourselves before it goes back into the page.
+    function plain(html) {
+        var box = document.createElement("div");
+        box.innerHTML = String(html || "");
+        return (box.textContent || "")
+            // Some excerpts carry double-encoded markup (&lt;b&gt;), which
+            // survives the decode above as literal tag text.
+            .replace(/<\/?[a-z][^>]*>/gi, " ")
+            .replace(/\s+/g, " ")
+            .replace(/\s*\[(?:…|\.\.\.)\]\s*$/, "…")
+            .trim();
+    }
+
+    function formatDate(iso) {
+        var d = new Date(iso);
+        if (isNaN(d)) return "";
+        return d.toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric" });
+    }
+
+    function pillFor(categories) {
+        var ids = categories || [];
+        for (var i = 0; i < PILLS.length; i++) {
+            if (ids.indexOf(PILLS[i][0]) !== -1) {
+                return '<span class="rcjq-media__pill rcjq-media__pill--' + PILLS[i][2] + '">' +
+                    PILLS[i][1] + "</span>";
+            }
+        }
+        return '<span class="rcjq-media__pill">Update</span>';
+    }
+
+    function thumbFor(post, title) {
+        var media = post._embedded &&
+            post._embedded["wp:featuredmedia"] &&
+            post._embedded["wp:featuredmedia"][0];
+        var sizes = media && media.media_details && media.media_details.sizes;
+        var src = (sizes && ((sizes.medium_large && sizes.medium_large.source_url) ||
+                (sizes.medium && sizes.medium.source_url) ||
+                (sizes.thumbnail && sizes.thumbnail.source_url))) ||
+            (media && media.source_url);
+
+        if (!src) {
+            return '<span class="rcjq-media__thumb rcjq-media__thumb--empty" aria-hidden="true">RCJQ</span>';
+        }
+        var alt = (media && media.alt_text) ? media.alt_text : title;
+        return '<img class="rcjq-media__thumb" src="' + esc(src) + '" alt="' + esc(alt) +
+            '" loading="lazy" decoding="async">';
+    }
+
+    function card(post) {
+        var title = plain(post.title && post.title.rendered) || "Untitled post";
+        var excerpt = plain(post.excerpt && post.excerpt.rendered);
+        return '<a class="rcjq-media__card" href="' + esc(post.link) + '">' +
+            thumbFor(post, title) +
+            '<span class="rcjq-media__body">' +
+                '<span class="rcjq-media__meta">' +
+                    '<span class="rcjq-media__date">' + esc(formatDate(post.date)) + "</span>" +
+                    pillFor(post.categories) +
+                "</span>" +
+                '<span class="rcjq-media__name">' + esc(title) + "</span>" +
+                (excerpt ? '<span class="rcjq-media__excerpt">' + esc(excerpt) + "</span>" : "") +
+                '<span class="rcjq-media__read">Read the post &rarr;</span>' +
+            "</span>" +
+        "</a>";
+    }
+
+    function fallback() {
+        grid.innerHTML = '<p class="rcjq-media__note">Couldn\'t load the latest posts just now — ' +
+            'they\'re all on the <a href="' + esc(CONFIG.archive) + '">Queensland news archive</a>.</p>';
+    }
+
+    // Ask for a few extras so the exclude list can't shrink the row below the limit.
+    var url = "/wp-json/wp/v2/posts" +
+        "?categories=" + encodeURIComponent(CONFIG.category) +
+        "&per_page=" + (CONFIG.limit + CONFIG.exclude.length + 3) +
+        "&orderby=date&order=desc&_embed=wp:featuredmedia" +
+        "&_fields=id,date,link,title,excerpt,categories,_links,_embedded";
+
+    fetch(url, { credentials: "omit" })
+        .then(function (res) {
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            return res.json();
+        })
+        .then(function (posts) {
+            var shown = (posts || [])
+                .filter(function (p) { return CONFIG.exclude.indexOf(p.id) === -1; })
+                .slice(0, CONFIG.limit);
+
+            if (!shown.length) {
+                grid.innerHTML = '<p class="rcjq-media__note">No posts published yet — check back soon.</p>';
+                return;
+            }
+            grid.innerHTML = shown.map(card).join("");
+        })
+        .catch(function (err) {
+            if (window.console) console.error("RCJQ media feed failed:", err);
+            fallback();
+        });
+}());
+</script>
