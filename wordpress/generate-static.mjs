@@ -1,13 +1,17 @@
 #!/usr/bin/env node
 /**
- * Regenerates rcjq-in-the-media-static.html — the no-JavaScript version of the
- * media block, with the current posts baked straight into the markup.
+ * Regenerates the two derived files in this folder:
+ *
+ *   - rcjq-in-the-media-static.html  the no-JavaScript version of the block,
+ *                                    with the current posts baked into markup
+ *   - rcjq-media-shortcode.php       gets the shared CSS injected between its
+ *                                    RCJQ-CSS markers
  *
  *   node wordpress/generate-static.mjs
  *
- * The CSS is not duplicated here: it is lifted from the <style> block in
- * rcjq-in-the-media.html, so the two variants always look identical.
- * Re-run this whenever a new QLD post is published.
+ * rcjq-in-the-media.html is the single hand-edited source of the CSS; both
+ * outputs above take their styling from its <style> block, so the three
+ * versions of this section can't drift apart.
  *
  * Requires Node 18+ (uses global fetch).
  */
@@ -19,6 +23,7 @@ import { dirname, join } from "node:path";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const LIVE = join(HERE, "rcjq-in-the-media.html");
 const OUT = join(HERE, "rcjq-in-the-media-static.html");
+const PHP = join(HERE, "rcjq-media-shortcode.php");
 
 const SITE = "https://www.robocupjunior.org.au";
 const CATEGORY = 80; // QLD
@@ -154,4 +159,25 @@ ${style[0]}
 
 await writeFile(OUT, html, "utf8");
 console.log(`Wrote ${OUT}`);
+
+// The PHP shortcode carries the same CSS inline, so it stays a single portable
+// file. Inject it between the markers rather than keeping a second copy.
+const START = "/* RCJQ-CSS-START — generated, do not hand-edit */";
+const END = "/* RCJQ-CSS-END */";
+const php = await readFile(PHP, "utf8");
+const markers = new RegExp(`${escapeRe(START)}[\\s\\S]*?${escapeRe(END)}`);
+if (!markers.test(php)) throw new Error(`CSS markers not found in ${PHP}`);
+
+const inner = style[0].replace(/^<style>\n?/, "").replace(/\n?<\/style>$/, "");
+// A nowdoc ends at a line starting with its identifier — CSS never does, but
+// guard anyway so generated output can't break PHP parsing.
+if (/^CSS\b/m.test(inner)) throw new Error("CSS body would terminate the PHP nowdoc");
+
+await writeFile(PHP, php.replace(markers, `${START}\n${inner}\n${END}`), "utf8");
+console.log(`Wrote ${PHP}`);
+
 console.log(`${posts.length} posts, newest: ${plain(posts[0].title.rendered)}`);
+
+function escapeRe(s) {
+    return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
