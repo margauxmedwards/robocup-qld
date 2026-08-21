@@ -458,6 +458,89 @@
             padding: 6px 14px;
         }
 
+        /* ---------- In the media ---------- */
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        @media (max-width: 560px) {
+            .media-grid { grid-template-columns: 1fr; }
+        }
+
+        .media-grid .events-note { grid-column: 1 / -1; }
+
+        .media-card {
+            display: flex;
+            flex-direction: column;
+            background: var(--card);
+            border-radius: 14px;
+            overflow: hidden;
+            text-decoration: none;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .media-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+        }
+
+        .media-thumb {
+            display: block;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            object-fit: cover;
+            background: rgba(25, 47, 89, 0.08);
+        }
+
+        /* Stand-in for posts with no featured image. */
+        .media-thumb.empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--navy), var(--navy-deep));
+            color: var(--green-bright);
+            font-size: 0.9rem;
+            font-weight: 800;
+            letter-spacing: 3px;
+        }
+
+        .media-body { padding: 14px 16px 16px; }
+
+        .media-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 7px; }
+
+        .media-date {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .media-name {
+            display: block;
+            font-size: 1rem;
+            font-weight: 700;
+            line-height: 1.35;
+            color: var(--navy);
+            margin-bottom: 6px;
+        }
+
+        .media-excerpt {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            font-size: 0.87rem;
+            line-height: 1.55;
+            color: var(--muted);
+        }
+
+        .pill.news { background: rgba(157, 189, 56, 0.2); color: var(--green-dark); }
+        .pill.resource { background: #f0ecfb; color: #5b3fa8; }
+
         /* ---------- Socials / footer ---------- */
         .socials {
             display: flex;
@@ -717,6 +800,19 @@
         </div>
     </section>
 
+    <!-- ============ IN THE MEDIA ============ -->
+    <section class="section" id="media">
+        <span class="kicker">Latest updates</span>
+        <h2>RCJQ in the media</h2>
+        <p class="sub">Announcements, information packs and season news, straight from the official RoboCup Junior Australia site.</p>
+        <div class="media-grid" id="media-grid">
+            <div class="events-note">Loading the latest RCJQ posts…</div>
+        </div>
+        <a class="see-all" href="https://www.robocupjunior.org.au/category/qld/" target="_blank" rel="noopener">
+            See every Queensland post on robocupjunior.org.au →
+        </a>
+    </section>
+
     <!-- ============ CONTACT ============ -->
     <section class="section" id="contact" style="text-align: center;">
         <span class="kicker">Contact</span>
@@ -857,6 +953,113 @@
         .catch(err => {
             console.error("Event feed failed:", err);
             showFallback();
+        });
+
+    // ---------------------------------------------------------------------
+    // RCJQ in the media — latest QLD posts, read from the public WordPress
+    // REST API on robocupjunior.org.au (published posts only, no auth).
+    // ---------------------------------------------------------------------
+    const WP_BASE = "https://www.robocupjunior.org.au";
+    const QLD_CATEGORY = 80;
+    const MAX_POSTS = 6;
+    // Evergreen challenge page rather than news — already featured above.
+    const SKIP_POSTS = [20692];
+
+    // Category id → pill label. First match wins, so order matters.
+    const POST_PILLS = [
+        [88, "Event", "competition"],
+        [89, "Workshop", "workshop"],
+        [86, "News", "news"],
+        [90, "Resources", "resource"],
+        [2, "News", "news"]
+    ];
+
+    // WP returns rendered HTML; reduce it to plain text so we can re-escape it.
+    function plainText(html) {
+        const box = document.createElement("div");
+        box.innerHTML = String(html || "");
+        return (box.textContent || "")
+            // Some excerpts carry double-encoded markup (&lt;b&gt;), which
+            // survives the decode above as literal tag text.
+            .replace(/<\/?[a-z][^>]*>/gi, " ")
+            .replace(/\s+/g, " ")
+            .replace(/\s*\[(?:…|\.\.\.)\]\s*$/, "…")
+            .trim();
+    }
+
+    function postPill(categories) {
+        const ids = categories || [];
+        const hit = POST_PILLS.find(([id]) => ids.includes(id));
+        return hit
+            ? `<span class="pill ${hit[2]}">${hit[1]}</span>`
+            : '<span class="pill news">Update</span>';
+    }
+
+    function postThumb(post, title) {
+        const media = post._embedded
+            && post._embedded["wp:featuredmedia"]
+            && post._embedded["wp:featuredmedia"][0];
+        const sizes = (media && media.media_details && media.media_details.sizes) || {};
+        const src = (sizes.medium_large || sizes.medium || sizes.thumbnail || {}).source_url
+            || (media && media.source_url);
+
+        if (!src) return '<span class="media-thumb empty" aria-hidden="true">RCJQ</span>';
+        const alt = (media && media.alt_text) || title;
+        return `<img class="media-thumb" src="${esc(src)}" alt="${esc(alt)}" loading="lazy" decoding="async">`;
+    }
+
+    function renderPosts(posts) {
+        const grid = document.getElementById("media-grid");
+        const shown = posts
+            .filter(p => !SKIP_POSTS.includes(p.id))
+            .slice(0, MAX_POSTS);
+
+        if (!shown.length) {
+            grid.innerHTML = `
+                <div class="events-note">
+                    Nothing published just yet — news lands on
+                    <a href="${WP_BASE}/category/qld/" target="_blank" rel="noopener">robocupjunior.org.au</a> first.
+                </div>`;
+            return;
+        }
+
+        grid.innerHTML = shown.map(post => {
+            const title = plainText(post.title && post.title.rendered) || "Untitled post";
+            const excerpt = plainText(post.excerpt && post.excerpt.rendered);
+            const date = new Date(post.date).toLocaleDateString("en-AU", {
+                day: "numeric", month: "short", year: "numeric"
+            });
+            return `
+                <a class="media-card" href="${esc(post.link)}" target="_blank" rel="noopener">
+                    ${postThumb(post, title)}
+                    <span class="media-body">
+                        <span class="media-meta">
+                            <span class="media-date">${esc(date)}</span>${postPill(post.categories)}
+                        </span>
+                        <span class="media-name">${esc(title)}</span>
+                        ${excerpt ? `<span class="media-excerpt">${esc(excerpt)}</span>` : ""}
+                    </span>
+                </a>`;
+        }).join("");
+    }
+
+    // Ask for a few extras so SKIP_POSTS can't shrink the grid below MAX_POSTS.
+    const postsUrl = `${WP_BASE}/wp-json/wp/v2/posts`
+        + `?categories=${QLD_CATEGORY}`
+        + `&per_page=${MAX_POSTS + SKIP_POSTS.length + 3}`
+        + "&orderby=date&order=desc&_embed=wp:featuredmedia"
+        + "&_fields=id,date,link,title,excerpt,categories,_links,_embedded";
+
+    fetch(postsUrl, { credentials: "omit" })
+        .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+        .then(renderPosts)
+        .catch(err => {
+            console.error("Post feed failed:", err);
+            document.getElementById("media-grid").innerHTML = `
+                <div class="events-note">
+                    Couldn't load the latest posts just now — read them all on
+                    <a href="${WP_BASE}/category/qld/" target="_blank" rel="noopener">robocupjunior.org.au</a>.
+                </div>`;
         });
 </script>
 </body>
