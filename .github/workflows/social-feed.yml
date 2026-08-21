@@ -1,0 +1,76 @@
+name: Refresh social feed
+
+# Rebuilds data/social-posts.json from the RCJQ Facebook, Instagram and
+# LinkedIn accounts, so the "RCJQ in the media" section on the landing page
+# stays current without a build step in the page itself.
+#
+# Secrets (Settings -> Secrets and variables -> Actions). Each platform is
+# independent — configure only the ones you have tokens for, and the others
+# keep whatever they last published.
+#
+#   FB_PAGE_ID        numeric id of the RoboCupJuniorQld page
+#   FB_PAGE_TOKEN     long-lived page access token
+#   IG_USER_ID        Instagram business account id
+#   IG_TOKEN          long-lived access token
+#   LINKEDIN_ORG_URN  e.g. urn:li:organization:1234567  (optional)
+#   LINKEDIN_TOKEN    LinkedIn access token             (optional)
+#
+# Without LinkedIn secrets the script reads data/linkedin-posts.json instead.
+
+on:
+  schedule:
+    # 19:10 UTC daily = ~05:10 AEST, so mornings in QLD see the overnight posts.
+    - cron: "10 19 * * *"
+  workflow_dispatch:
+
+# One run at a time: two concurrent runs would race on the same commit.
+concurrency:
+  group: social-feed
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Fetch posts
+        env:
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+          LINKEDIN_ORG_URN: ${{ secrets.LINKEDIN_ORG_URN }}
+          LINKEDIN_TOKEN: ${{ secrets.LINKEDIN_TOKEN }}
+        run: node scripts/fetch-social.mjs | tee fetch.log
+
+      - name: Surface any source problems
+        run: |
+          if grep -q '^  ! ' fetch.log; then
+            {
+              echo "### Social feed warnings"
+              echo
+              grep '^  ! ' fetch.log | sed 's/^  ! /- /'
+              echo
+              echo "Affected platforms kept their previously published posts."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Commit if the feed changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/social-posts.json data/social-images
+          if git diff --cached --quiet; then
+            echo "Feed unchanged."
+          else
+            git commit -m "Refresh social feed"
+            git push
+          fi

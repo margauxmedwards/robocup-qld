@@ -538,8 +538,9 @@
             color: var(--muted);
         }
 
-        .pill.news { background: rgba(157, 189, 56, 0.2); color: var(--green-dark); }
-        .pill.resource { background: #f0ecfb; color: #5b3fa8; }
+        .pill.facebook { background: #e7f0fb; color: #1a5fa8; }
+        .pill.instagram { background: #fdeaf2; color: #b3247c; }
+        .pill.linkedin { background: #e4f1f8; color: #0a5c86; }
 
         /* ---------- Socials / footer ---------- */
         .socials {
@@ -804,12 +805,12 @@
     <section class="section" id="media">
         <span class="kicker">Latest updates</span>
         <h2>RCJQ in the media</h2>
-        <p class="sub">Announcements, information packs and season news, straight from the official RoboCup Junior Australia site.</p>
+        <p class="sub">Photos, results and announcements as they go up on our Facebook, Instagram and LinkedIn.</p>
         <div class="media-grid" id="media-grid">
-            <div class="events-note">Loading the latest RCJQ posts…</div>
+            <div class="events-note">Loading the latest posts…</div>
         </div>
-        <a class="see-all" href="https://www.robocupjunior.org.au/category/qld/" target="_blank" rel="noopener">
-            See every Queensland post on robocupjunior.org.au →
+        <a class="see-all" href="https://www.instagram.com/robocupjunior.qld/" target="_blank" rel="noopener">
+            Follow @robocupjunior.qld for everything as it happens →
         </a>
     </section>
 
@@ -956,110 +957,84 @@
         });
 
     // ---------------------------------------------------------------------
-    // RCJQ in the media — latest QLD posts, read from the public WordPress
-    // REST API on robocupjunior.org.au (published posts only, no auth).
+    // RCJQ in the media — posts from the RCJQ Facebook, Instagram and
+    // LinkedIn accounts. Read from data/social-posts.json, which the
+    // "Refresh social feed" GitHub Action rebuilds daily; none of these
+    // platforms can be read from the browser without a token.
     // ---------------------------------------------------------------------
-    const WP_BASE = "https://www.robocupjunior.org.au";
-    const QLD_CATEGORY = 80;
-    const MAX_POSTS = 6;
-    // Evergreen challenge page rather than news — already featured above.
-    const SKIP_POSTS = [20692];
+    const SOCIAL_FEED = "data/social-posts.json";
+    const MAX_SOCIAL = 6;
 
-    // Category id → pill label. First match wins, so order matters.
-    const POST_PILLS = [
-        [88, "Event", "competition"],
-        [89, "Workshop", "workshop"],
-        [86, "News", "news"],
-        [90, "Resources", "resource"],
-        [2, "News", "news"]
-    ];
+    const PLATFORMS = {
+        facebook: { label: "Facebook", url: "https://www.facebook.com/RoboCupJuniorQld/" },
+        instagram: { label: "Instagram", url: "https://www.instagram.com/robocupjunior.qld/" },
+        linkedin: { label: "LinkedIn", url: "https://www.linkedin.com/company/robocupjuniorqld" }
+    };
 
-    // WP returns rendered HTML; reduce it to plain text so we can re-escape it.
-    function plainText(html) {
-        const box = document.createElement("div");
-        box.innerHTML = String(html || "");
-        return (box.textContent || "")
-            // Some excerpts carry double-encoded markup (&lt;b&gt;), which
-            // survives the decode above as literal tag text.
-            .replace(/<\/?[a-z][^>]*>/gi, " ")
+    // Captions run long and carry hashtag blocks; keep the first few lines.
+    function captionText(text) {
+        return String(text || "")
+            .split("\n")
+            .map(line => line.trim())
+            .filter(line => line && !/^#/.test(line))
+            .join(" ")
             .replace(/\s+/g, " ")
-            .replace(/\s*\[(?:…|\.\.\.)\]\s*$/, "…")
             .trim();
     }
 
-    function postPill(categories) {
-        const ids = categories || [];
-        const hit = POST_PILLS.find(([id]) => ids.includes(id));
-        return hit
-            ? `<span class="pill ${hit[2]}">${hit[1]}</span>`
-            : '<span class="pill news">Update</span>';
+    function socialThumb(post) {
+        if (!post.image) {
+            const label = (PLATFORMS[post.platform] || {}).label || "RCJQ";
+            return `<span class="media-thumb empty" aria-hidden="true">${esc(label)}</span>`;
+        }
+        return `<img class="media-thumb" src="${esc(post.image)}"
+            alt="${esc(captionText(post.text).slice(0, 90) || "RCJQ social post")}"
+            loading="lazy" decoding="async">`;
     }
 
-    function postThumb(post, title) {
-        const media = post._embedded
-            && post._embedded["wp:featuredmedia"]
-            && post._embedded["wp:featuredmedia"][0];
-        const sizes = (media && media.media_details && media.media_details.sizes) || {};
-        const src = (sizes.medium_large || sizes.medium || sizes.thumbnail || {}).source_url
-            || (media && media.source_url);
-
-        if (!src) return '<span class="media-thumb empty" aria-hidden="true">RCJQ</span>';
-        const alt = (media && media.alt_text) || title;
-        return `<img class="media-thumb" src="${esc(src)}" alt="${esc(alt)}" loading="lazy" decoding="async">`;
+    function socialFallback(profiles) {
+        const links = Object.keys(PLATFORMS).map(key => {
+            const url = (profiles && profiles[key]) || PLATFORMS[key].url;
+            return `<a href="${esc(url)}" target="_blank" rel="noopener">${PLATFORMS[key].label}</a>`;
+        }).join(" · ");
+        return `<div class="events-note">Latest posts are on ${links}.</div>`;
     }
 
-    function renderPosts(posts) {
+    function renderSocial(feed) {
         const grid = document.getElementById("media-grid");
-        const shown = posts
-            .filter(p => !SKIP_POSTS.includes(p.id))
-            .slice(0, MAX_POSTS);
+        const posts = (feed && Array.isArray(feed.posts) ? feed.posts : []).slice(0, MAX_SOCIAL);
 
-        if (!shown.length) {
-            grid.innerHTML = `
-                <div class="events-note">
-                    Nothing published just yet — news lands on
-                    <a href="${WP_BASE}/category/qld/" target="_blank" rel="noopener">robocupjunior.org.au</a> first.
-                </div>`;
+        if (!posts.length) {
+            grid.innerHTML = socialFallback(feed && feed.profiles);
             return;
         }
 
-        grid.innerHTML = shown.map(post => {
-            const title = plainText(post.title && post.title.rendered) || "Untitled post";
-            const excerpt = plainText(post.excerpt && post.excerpt.rendered);
+        grid.innerHTML = posts.map(post => {
+            const platform = PLATFORMS[post.platform] || { label: "RCJQ" };
+            const caption = captionText(post.text);
             const date = new Date(post.date).toLocaleDateString("en-AU", {
                 day: "numeric", month: "short", year: "numeric"
             });
             return `
-                <a class="media-card" href="${esc(post.link)}" target="_blank" rel="noopener">
-                    ${postThumb(post, title)}
+                <a class="media-card" href="${esc(post.url)}" target="_blank" rel="noopener">
+                    ${socialThumb(post)}
                     <span class="media-body">
                         <span class="media-meta">
-                            <span class="media-date">${esc(date)}</span>${postPill(post.categories)}
+                            <span class="media-date">${esc(date)}</span>
+                            <span class="pill ${esc(post.platform)}">${esc(platform.label)}</span>
                         </span>
-                        <span class="media-name">${esc(title)}</span>
-                        ${excerpt ? `<span class="media-excerpt">${esc(excerpt)}</span>` : ""}
+                        ${caption ? `<span class="media-excerpt">${esc(caption)}</span>` : ""}
                     </span>
                 </a>`;
         }).join("");
     }
 
-    // Ask for a few extras so SKIP_POSTS can't shrink the grid below MAX_POSTS.
-    const postsUrl = `${WP_BASE}/wp-json/wp/v2/posts`
-        + `?categories=${QLD_CATEGORY}`
-        + `&per_page=${MAX_POSTS + SKIP_POSTS.length + 3}`
-        + "&orderby=date&order=desc&_embed=wp:featuredmedia"
-        + "&_fields=id,date,link,title,excerpt,categories,_links,_embedded";
-
-    fetch(postsUrl, { credentials: "omit" })
+    fetch(SOCIAL_FEED, { cache: "no-cache" })
         .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
-        .then(renderPosts)
+        .then(renderSocial)
         .catch(err => {
-            console.error("Post feed failed:", err);
-            document.getElementById("media-grid").innerHTML = `
-                <div class="events-note">
-                    Couldn't load the latest posts just now — read them all on
-                    <a href="${WP_BASE}/category/qld/" target="_blank" rel="noopener">robocupjunior.org.au</a>.
-                </div>`;
+            console.error("Social feed failed:", err);
+            document.getElementById("media-grid").innerHTML = socialFallback(null);
         });
 </script>
 </body>

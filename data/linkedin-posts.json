@@ -1,0 +1,17 @@
+{
+  "_readme": [
+    "Hand-maintained LinkedIn posts, used when no LinkedIn API token is configured.",
+    "LinkedIn's organisation API needs Marketing Developer Platform approval; this",
+    "file means LinkedIn cards can appear without it.",
+    "",
+    "To add a post: open it on LinkedIn, copy the URL from the post's own page",
+    "(the ...-activity-1234567890 form), and add an entry below. Newest first is",
+    "tidiest but the feed re-sorts by date anyway.",
+    "",
+    "  url    required, links straight to the post",
+    "  date   required, ISO 8601 (YYYY-MM-DD is fine)",
+    "  text   shown on the card; the first couple of lines is plenty",
+    "  image  optional, either a URL or a repo-relative path"
+  ],
+  "posts": []
+}

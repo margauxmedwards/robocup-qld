@@ -1,0 +1,12 @@
+{
+  "generated": null,
+  "profiles": {
+    "facebook": "https://www.facebook.com/RoboCupJuniorQld/",
+    "instagram": "https://www.instagram.com/robocupjunior.qld/",
+    "linkedin": "https://www.linkedin.com/company/robocupjuniorqld"
+  },
+  "notes": [
+    "Placeholder feed. Run the \"Refresh social feed\" workflow once the platform secrets are set."
+  ],
+  "posts": []
+}
