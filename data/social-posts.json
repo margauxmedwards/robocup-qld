@@ -1,12 +1,14 @@
 {
-  "generated": null,
+  "generated": "2026-08-21T19:20:34.837Z",
   "profiles": {
     "facebook": "https://www.facebook.com/RoboCupJuniorQld/",
     "instagram": "https://www.instagram.com/robocupjunior.qld/",
     "linkedin": "https://www.linkedin.com/company/robocupjuniorqld"
   },
   "notes": [
-    "Placeholder feed. Run the \"Refresh social feed\" workflow once the platform secrets are set."
+    "Facebook skipped: FB_PAGE_ID / FB_PAGE_TOKEN not set",
+    "Instagram skipped: IG_USER_ID / IG_TOKEN not set",
+    "LinkedIn skipped: no API token and data/linkedin-posts.json is empty"
   ],
   "posts": []
 }
