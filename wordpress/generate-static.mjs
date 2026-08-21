@@ -1,17 +1,14 @@
 #!/usr/bin/env node
 /**
- * Regenerates the two derived files in this folder:
- *
- *   - rcjq-in-the-media-static.html  the no-JavaScript version of the block,
- *                                    with the current posts baked into markup
- *   - rcjq-media-shortcode.php       gets the shared CSS injected between its
- *                                    RCJQ-CSS markers
+ * Regenerates rcjq-in-the-media-static.html — the no-JavaScript version of the
+ * media block, with the current posts baked straight into the markup.
  *
  *   node wordpress/generate-static.mjs
  *
- * rcjq-in-the-media.html is the single hand-edited source of the CSS; both
- * outputs above take their styling from its <style> block, so the three
- * versions of this section can't drift apart.
+ * Reads the same published feed the live block reads, so both show the same
+ * posts, and lifts the CSS from the <style> block in rcjq-in-the-media.html so
+ * the two can't drift apart visually. Re-run it whenever you want the static
+ * copy refreshed.
  *
  * Requires Node 18+ (uses global fetch).
  */
@@ -23,21 +20,16 @@ import { dirname, join } from "node:path";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const LIVE = join(HERE, "rcjq-in-the-media.html");
 const OUT = join(HERE, "rcjq-in-the-media-static.html");
-const PHP = join(HERE, "rcjq-media-shortcode.php");
 
-const SITE = "https://www.robocupjunior.org.au";
-const CATEGORY = 80; // QLD
+const BASE = "https://margauxmedwards.github.io/robocup-qld/";
+const FEED = `${BASE}data/social-posts.json`;
 const LIMIT = 6;
-const EXCLUDE = [20692]; // "RoboCup Junior Queensland Sumo Competition"
-const ARCHIVE = "/category/qld/";
 
-const PILLS = [
-    [88, "Event", "event"],
-    [89, "Workshop", "workshop"],
-    [86, "News", "news"],
-    [90, "Resources", "resource"],
-    [2, "News", "news"],
-];
+const LABELS = {
+    facebook: { label: "Facebook", url: "https://www.facebook.com/RoboCupJuniorQld/" },
+    instagram: { label: "Instagram", url: "https://www.instagram.com/robocupjunior.qld/" },
+    linkedin: { label: "LinkedIn", url: "https://www.linkedin.com/company/robocupjuniorqld" },
+};
 
 const esc = (str) =>
     String(str)
@@ -46,77 +38,59 @@ const esc = (str) =>
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;");
 
-/** Rendered WP HTML -> plain text (tags dropped, entities decoded). */
-function plain(html) {
-    const named = {
-        amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " ",
-        hellip: "…", ldquo: "“", rdquo: "”", lsquo: "‘",
-        rsquo: "’", ndash: "–", mdash: "—",
-    };
-    // Entities are decoded *before* tags are stripped: some excerpts carry
-    // double-encoded markup (&lt;b&gt;) that would otherwise show up literally.
-    return String(html || "")
-        .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
-        .replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCodePoint(parseInt(n, 16)))
-        .replace(/&([a-z]+);/gi, (m, n) => (n.toLowerCase() in named ? named[n.toLowerCase()] : m))
-        .replace(/<[^>]*>/g, " ")
+/** Captions run long and end in hashtag blocks; keep the readable part. */
+const caption = (text) =>
+    String(text || "")
+        .split("\n")
+        .map((line) => line.trim())
+        .filter((line) => line && !line.startsWith("#"))
+        .join(" ")
         .replace(/\s+/g, " ")
-        .replace(/\s*\[(?:…|\.\.\.)\]\s*$/, "…")
         .trim();
-}
+
+const absolute = (path) =>
+    !path ? null : /^https?:\/\//i.test(path) ? path : BASE + String(path).replace(/^\//, "");
 
 const formatDate = (iso) =>
     new Date(iso).toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric" });
 
-function pillFor(categories = []) {
-    const hit = PILLS.find(([id]) => categories.includes(id));
-    if (!hit) return '<span class="rcjq-media__pill">Update</span>';
-    return `<span class="rcjq-media__pill rcjq-media__pill--${hit[2]}">${hit[1]}</span>`;
-}
-
-function thumbFor(post, title) {
-    const media = post._embedded?.["wp:featuredmedia"]?.[0];
-    const sizes = media?.media_details?.sizes;
-    const src =
-        sizes?.medium_large?.source_url ||
-        sizes?.medium?.source_url ||
-        sizes?.thumbnail?.source_url ||
-        media?.source_url;
-
+function thumb(post, text) {
+    const src = absolute(post.image);
     if (!src) {
-        return '<span class="rcjq-media__thumb rcjq-media__thumb--empty" aria-hidden="true">RCJQ</span>';
+        const name = LABELS[post.platform]?.label || "RCJQ";
+        return `<span class="rcjq-media__thumb rcjq-media__thumb--empty" aria-hidden="true">${esc(name)}</span>`;
     }
-    return `<img class="rcjq-media__thumb" src="${esc(src)}" alt="${esc(media?.alt_text || title)}" loading="lazy" decoding="async">`;
+    return `<img class="rcjq-media__thumb" src="${esc(src)}" alt="${esc(text.slice(0, 90) || "RCJQ social post")}" loading="lazy" decoding="async">`;
 }
 
 function card(post) {
-    const title = plain(post.title?.rendered) || "Untitled post";
-    const excerpt = plain(post.excerpt?.rendered);
-    return `        <a class="rcjq-media__card" href="${esc(post.link)}">
-            ${thumbFor(post, title)}
+    const meta = LABELS[post.platform] || { label: "RCJQ" };
+    const text = caption(post.text);
+    return `        <a class="rcjq-media__card" href="${esc(post.url)}" target="_blank" rel="noopener">
+            ${thumb(post, text)}
             <span class="rcjq-media__body">
                 <span class="rcjq-media__meta">
                     <span class="rcjq-media__date">${esc(formatDate(post.date))}</span>
-                    ${pillFor(post.categories)}
-                </span>
-                <span class="rcjq-media__name">${esc(title)}</span>${
-        excerpt ? `\n                <span class="rcjq-media__excerpt">${esc(excerpt)}</span>` : ""
+                    <span class="rcjq-media__pill rcjq-media__pill--${esc(post.platform)}">${esc(meta.label)}</span>
+                </span>${
+        text ? `\n                <span class="rcjq-media__excerpt">${esc(text)}</span>` : ""
     }
-                <span class="rcjq-media__read">Read the post &rarr;</span>
+                <span class="rcjq-media__read">View the post &rarr;</span>
             </span>
         </a>`;
 }
 
-const url =
-    `${SITE}/wp-json/wp/v2/posts?categories=${CATEGORY}` +
-    `&per_page=${LIMIT + EXCLUDE.length + 3}&orderby=date&order=desc` +
-    `&_embed=wp:featuredmedia&_fields=id,date,link,title,excerpt,categories,_links,_embedded`;
+const res = await fetch(FEED);
+if (!res.ok) throw new Error(`Feed returned HTTP ${res.status}`);
 
-const res = await fetch(url);
-if (!res.ok) throw new Error(`REST API returned HTTP ${res.status}`);
-
-const posts = (await res.json()).filter((p) => !EXCLUDE.includes(p.id)).slice(0, LIMIT);
-if (!posts.length) throw new Error("REST API returned no posts — refusing to write an empty block");
+const feed = await res.json();
+const posts = (Array.isArray(feed.posts) ? feed.posts : []).slice(0, LIMIT);
+if (!posts.length) {
+    throw new Error(
+        "The feed has no posts yet — set the platform secrets and run the " +
+            '"Refresh social feed" workflow before generating the static block.'
+    );
+}
 
 // Single source of truth for the styling: reuse the live block's <style> tag.
 const live = await readFile(LIVE, "utf8");
@@ -133,7 +107,7 @@ const html = `<!--
   Re-run that script to refresh the posts below.
 
   Use this version if your editor strips <script> tags. Otherwise prefer
-  rcjq-in-the-media.html, which updates itself.
+  rcjq-in-the-media.html, which updates itself as new posts are published.
   ============================================================================
 -->
 <section class="rcjq-media" aria-labelledby="rcjq-media-title">
@@ -141,7 +115,7 @@ const html = `<!--
         <span class="rcjq-media__kicker">Latest updates</span>
         <h2 class="rcjq-media__title" id="rcjq-media-title">RCJQ in the media</h2>
         <p class="rcjq-media__sub">
-            Announcements, information packs and season news from RoboCup Junior Queensland.
+            Photos, results and announcements as they go up on our Facebook, Instagram and LinkedIn.
         </p>
     </header>
 
@@ -149,8 +123,8 @@ const html = `<!--
 ${posts.map(card).join("\n")}
     </div>
 
-    <a class="rcjq-media__all" href="${ARCHIVE}">
-        See every Queensland post &rarr;
+    <a class="rcjq-media__all" href="${LABELS.instagram.url}" target="_blank" rel="noopener">
+        Follow @robocupjunior.qld &rarr;
     </a>
 </section>
 
@@ -160,24 +134,5 @@ ${style[0]}
 await writeFile(OUT, html, "utf8");
 console.log(`Wrote ${OUT}`);
 
-// The PHP shortcode carries the same CSS inline, so it stays a single portable
-// file. Inject it between the markers rather than keeping a second copy.
-const START = "/* RCJQ-CSS-START — generated, do not hand-edit */";
-const END = "/* RCJQ-CSS-END */";
-const php = await readFile(PHP, "utf8");
-const markers = new RegExp(`${escapeRe(START)}[\\s\\S]*?${escapeRe(END)}`);
-if (!markers.test(php)) throw new Error(`CSS markers not found in ${PHP}`);
-
-const inner = style[0].replace(/^<style>\n?/, "").replace(/\n?<\/style>$/, "");
-// A nowdoc ends at a line starting with its identifier — CSS never does, but
-// guard anyway so generated output can't break PHP parsing.
-if (/^CSS\b/m.test(inner)) throw new Error("CSS body would terminate the PHP nowdoc");
-
-await writeFile(PHP, php.replace(markers, `${START}\n${inner}\n${END}`), "utf8");
-console.log(`Wrote ${PHP}`);
-
-console.log(`${posts.length} posts, newest: ${plain(posts[0].title.rendered)}`);
-
-function escapeRe(s) {
-    return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
+const counts = posts.reduce((acc, p) => ({ ...acc, [p.platform]: (acc[p.platform] || 0) + 1 }), {});
+console.log(`${posts.length} post(s): ${JSON.stringify(counts)}`);

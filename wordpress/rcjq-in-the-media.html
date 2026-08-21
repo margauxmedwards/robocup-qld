@@ -2,12 +2,20 @@
   ============================================================================
   RCJQ IN THE MEDIA — self-updating WordPress block
   ============================================================================
-  Paste this whole file into a Custom HTML block (or a Kingster/GoodLayers
-  "Text Box" element switched to HTML mode) on robocupjunior.org.au.
+  Paste this whole file into a custom code / HTML element on the page.
 
-  It reads published posts straight from this site's own REST API, so the list
-  updates itself every time someone publishes a new QLD post — nothing to edit
-  here when a new post goes up.
+  The QLD page (/challenge-regions/qld/) is built with the GoodLayers page
+  builder and has an empty post_content, so there is no Gutenberg canvas and no
+  Custom HTML block — use the builder's custom code element instead.
+
+  It shows the latest posts from the RCJQ Facebook, Instagram and LinkedIn
+  accounts, read from the feed published by the landing-page repo:
+
+      https://margauxmedwards.github.io/robocup-qld/data/social-posts.json
+
+  That feed is rebuilt daily by a GitHub Action, so this block updates itself.
+  None of the three platforms can be read from a browser directly — they all
+  put post content behind a login wall — which is why the feed exists.
 
   To change what it shows, edit the CONFIG block near the bottom of this file.
 
@@ -20,16 +28,16 @@
         <span class="rcjq-media__kicker">Latest updates</span>
         <h2 class="rcjq-media__title" id="rcjq-media-title">RCJQ in the media</h2>
         <p class="rcjq-media__sub">
-            Announcements, information packs and season news from RoboCup Junior Queensland.
+            Photos, results and announcements as they go up on our Facebook, Instagram and LinkedIn.
         </p>
     </header>
 
     <div class="rcjq-media__grid" id="rcjq-media-grid">
-        <p class="rcjq-media__note">Loading the latest RCJQ posts&hellip;</p>
+        <p class="rcjq-media__note">Loading the latest posts&hellip;</p>
     </div>
 
-    <a class="rcjq-media__all" href="/category/qld/">
-        See every Queensland post &rarr;
+    <a class="rcjq-media__all" href="https://www.instagram.com/robocupjunior.qld/" target="_blank" rel="noopener">
+        Follow @robocupjunior.qld &rarr;
     </a>
 </section>
 
@@ -127,7 +135,7 @@
     background: rgba(25, 47, 89, 0.07);
 }
 
-/* Shown when a post has no featured image. */
+/* Shown when a post has no image of its own. */
 .rcjq-media__thumb--empty {
     display: flex;
     align-items: center;
@@ -174,19 +182,9 @@
     color: var(--rcjq-navy);
 }
 
-.rcjq-media__pill--event { background: #fdeee4; color: #c0561b; }
-.rcjq-media__pill--workshop { background: #e7f0fb; color: #1a5fa8; }
-.rcjq-media__pill--news { background: rgba(157, 189, 56, 0.2); color: var(--rcjq-green-dark); }
-.rcjq-media__pill--resource { background: #f0ecfb; color: #5b3fa8; }
-
-.rcjq-media__name {
-    display: block;
-    margin: 0 0 7px;
-    font-size: 1.02rem;
-    font-weight: 700;
-    line-height: 1.35;
-    color: var(--rcjq-navy);
-}
+.rcjq-media__pill--facebook { background: #e7f0fb; color: #1a5fa8; }
+.rcjq-media__pill--instagram { background: #fdeaf2; color: #b3247c; }
+.rcjq-media__pill--linkedin { background: #e4f1f8; color: #0a5c86; }
 
 .rcjq-media__excerpt {
     margin: 0;
@@ -194,7 +192,7 @@
     line-height: 1.55;
     color: var(--rcjq-muted);
     display: -webkit-box;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 4;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -247,27 +245,22 @@
 
     /* ======================= CONFIG — edit these ======================= */
     var CONFIG = {
-        // Category to pull posts from. 80 = QLD.
-        // Swap to 87 to show only posts filed under "In The Media" instead.
-        category: 80,
+        // Where the published feed lives. Images in the feed are relative to
+        // this, so keep the trailing slash on base.
+        base: "https://margauxmedwards.github.io/robocup-qld/",
+        feed: "data/social-posts.json",
         // How many cards to show.
         limit: 6,
-        // Post IDs to skip (e.g. evergreen pages that aren't really news).
-        // 20692 = "RoboCup Junior Queensland Sumo Competition".
-        exclude: [20692],
-        // Where the "see every post" link goes.
-        archive: "/category/qld/"
+        // Set to ["instagram"] (etc.) to show only certain platforms.
+        platforms: ["facebook", "instagram", "linkedin"]
     };
     /* ================================================================== */
 
-    // Category ID -> pill label. First match wins, so order matters.
-    var PILLS = [
-        [88, "Event", "event"],
-        [89, "Workshop", "workshop"],
-        [86, "News", "news"],
-        [90, "Resources", "resource"],
-        [2, "News", "news"]
-    ];
+    var LABELS = {
+        facebook: { label: "Facebook", url: "https://www.facebook.com/RoboCupJuniorQld/" },
+        instagram: { label: "Instagram", url: "https://www.instagram.com/robocupjunior.qld/" },
+        linkedin: { label: "LinkedIn", url: "https://www.linkedin.com/company/robocupjuniorqld" }
+    };
 
     var grid = document.getElementById("rcjq-media-grid");
     if (!grid) return;
@@ -280,18 +273,21 @@
             .replace(/"/g, "&quot;");
     }
 
-    // WP returns rendered HTML with entities; decode to plain text, then we
-    // re-escape it ourselves before it goes back into the page.
-    function plain(html) {
-        var box = document.createElement("div");
-        box.innerHTML = String(html || "");
-        return (box.textContent || "")
-            // Some excerpts carry double-encoded markup (&lt;b&gt;), which
-            // survives the decode above as literal tag text.
-            .replace(/<\/?[a-z][^>]*>/gi, " ")
+    // Captions run long and end in hashtag blocks; keep the readable part.
+    function caption(text) {
+        return String(text || "")
+            .split("\n")
+            .map(function (line) { return line.trim(); })
+            .filter(function (line) { return line && line.charAt(0) !== "#"; })
+            .join(" ")
             .replace(/\s+/g, " ")
-            .replace(/\s*\[(?:…|\.\.\.)\]\s*$/, "…")
             .trim();
+    }
+
+    function absolute(path) {
+        if (!path) return null;
+        if (/^https?:\/\//i.test(path)) return path;
+        return CONFIG.base.replace(/\/?$/, "/") + String(path).replace(/^\//, "");
     }
 
     function formatDate(iso) {
@@ -300,83 +296,60 @@
         return d.toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric" });
     }
 
-    function pillFor(categories) {
-        var ids = categories || [];
-        for (var i = 0; i < PILLS.length; i++) {
-            if (ids.indexOf(PILLS[i][0]) !== -1) {
-                return '<span class="rcjq-media__pill rcjq-media__pill--' + PILLS[i][2] + '">' +
-                    PILLS[i][1] + "</span>";
-            }
-        }
-        return '<span class="rcjq-media__pill">Update</span>';
-    }
-
-    function thumbFor(post, title) {
-        var media = post._embedded &&
-            post._embedded["wp:featuredmedia"] &&
-            post._embedded["wp:featuredmedia"][0];
-        var sizes = media && media.media_details && media.media_details.sizes;
-        var src = (sizes && ((sizes.medium_large && sizes.medium_large.source_url) ||
-                (sizes.medium && sizes.medium.source_url) ||
-                (sizes.thumbnail && sizes.thumbnail.source_url))) ||
-            (media && media.source_url);
-
+    function thumb(post, text) {
+        var src = absolute(post.image);
         if (!src) {
-            return '<span class="rcjq-media__thumb rcjq-media__thumb--empty" aria-hidden="true">RCJQ</span>';
+            var name = (LABELS[post.platform] || {}).label || "RCJQ";
+            return '<span class="rcjq-media__thumb rcjq-media__thumb--empty" aria-hidden="true">' +
+                esc(name) + "</span>";
         }
-        var alt = (media && media.alt_text) ? media.alt_text : title;
-        return '<img class="rcjq-media__thumb" src="' + esc(src) + '" alt="' + esc(alt) +
-            '" loading="lazy" decoding="async">';
+        return '<img class="rcjq-media__thumb" src="' + esc(src) + '" alt="' +
+            esc(text.slice(0, 90) || "RCJQ social post") + '" loading="lazy" decoding="async">';
     }
 
     function card(post) {
-        var title = plain(post.title && post.title.rendered) || "Untitled post";
-        var excerpt = plain(post.excerpt && post.excerpt.rendered);
-        return '<a class="rcjq-media__card" href="' + esc(post.link) + '">' +
-            thumbFor(post, title) +
+        var meta = LABELS[post.platform] || { label: "RCJQ" };
+        var text = caption(post.text);
+        return '<a class="rcjq-media__card" href="' + esc(post.url) + '" target="_blank" rel="noopener">' +
+            thumb(post, text) +
             '<span class="rcjq-media__body">' +
                 '<span class="rcjq-media__meta">' +
                     '<span class="rcjq-media__date">' + esc(formatDate(post.date)) + "</span>" +
-                    pillFor(post.categories) +
+                    '<span class="rcjq-media__pill rcjq-media__pill--' + esc(post.platform) + '">' +
+                        esc(meta.label) + "</span>" +
                 "</span>" +
-                '<span class="rcjq-media__name">' + esc(title) + "</span>" +
-                (excerpt ? '<span class="rcjq-media__excerpt">' + esc(excerpt) + "</span>" : "") +
-                '<span class="rcjq-media__read">Read the post &rarr;</span>' +
+                (text ? '<span class="rcjq-media__excerpt">' + esc(text) + "</span>" : "") +
+                '<span class="rcjq-media__read">View the post &rarr;</span>' +
             "</span>" +
         "</a>";
     }
 
-    function fallback() {
-        grid.innerHTML = '<p class="rcjq-media__note">Couldn\'t load the latest posts just now — ' +
-            'they\'re all on the <a href="' + esc(CONFIG.archive) + '">Queensland news archive</a>.</p>';
+    function fallback(profiles) {
+        var links = CONFIG.platforms.map(function (key) {
+            var url = (profiles && profiles[key]) || LABELS[key].url;
+            return '<a href="' + esc(url) + '" target="_blank" rel="noopener">' +
+                LABELS[key].label + "</a>";
+        }).join(" &middot; ");
+        return '<p class="rcjq-media__note">Latest posts are on ' + links + ".</p>";
     }
 
-    // Ask for a few extras so the exclude list can't shrink the row below the limit.
-    var url = "/wp-json/wp/v2/posts" +
-        "?categories=" + encodeURIComponent(CONFIG.category) +
-        "&per_page=" + (CONFIG.limit + CONFIG.exclude.length + 3) +
-        "&orderby=date&order=desc&_embed=wp:featuredmedia" +
-        "&_fields=id,date,link,title,excerpt,categories,_links,_embedded";
-
-    fetch(url, { credentials: "omit" })
+    fetch(absolute(CONFIG.feed), { credentials: "omit" })
         .then(function (res) {
             if (!res.ok) throw new Error("HTTP " + res.status);
             return res.json();
         })
-        .then(function (posts) {
-            var shown = (posts || [])
-                .filter(function (p) { return CONFIG.exclude.indexOf(p.id) === -1; })
+        .then(function (feed) {
+            var posts = (feed && feed.posts ? feed.posts : [])
+                .filter(function (p) { return CONFIG.platforms.indexOf(p.platform) !== -1; })
                 .slice(0, CONFIG.limit);
 
-            if (!shown.length) {
-                grid.innerHTML = '<p class="rcjq-media__note">No posts published yet — check back soon.</p>';
-                return;
-            }
-            grid.innerHTML = shown.map(card).join("");
+            grid.innerHTML = posts.length
+                ? posts.map(card).join("")
+                : fallback(feed && feed.profiles);
         })
         .catch(function (err) {
             if (window.console) console.error("RCJQ media feed failed:", err);
-            fallback();
+            grid.innerHTML = fallback(null);
         });
 }());
 </script>

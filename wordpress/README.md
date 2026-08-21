@@ -4,104 +4,72 @@ A drop-in version of the **RCJQ in the media** section from the
 [RCJQ landing page](https://margauxmedwards.github.io/robocup-qld/), for a page on
 robocupjunior.org.au.
 
-It lists the latest posts filed under the **QLD** category (id `80`) as cards with the
-featured image, date, a category pill, and the post excerpt.
+It shows the latest posts from the RCJQ **Facebook**, **Instagram** and **LinkedIn**
+accounts as cards with the post image, date, a platform badge, and the caption.
 
-## Start here: the QLD page has no HTML block
+## Where the posts come from
+
+All three platforms put post content behind a login wall, so none of them can be read
+from a browser. The landing-page repo runs a daily GitHub Action that fetches them and
+publishes a feed:
+
+```
+https://margauxmedwards.github.io/robocup-qld/data/social-posts.json
+```
+
+This block reads that feed, so it updates itself and needs no tokens of its own. The
+feed is served with `Access-Control-Allow-Origin: *`, so reading it from
+robocupjunior.org.au works. See the repo root `README.md` for the workflow and the
+secrets it needs.
+
+**Until those secrets are configured the feed is empty**, and the block falls back to
+links to the three profiles rather than looking broken.
+
+## The QLD page has no HTML block
 
 The QLD page (`/challenge-regions/qld/`, post id `6680`) is built entirely with the
-**GoodLayers page builder** that ships with Kingster. Its `post_content` is empty —
-the layout lives in post meta — so there is no Gutenberg canvas and no Custom HTML
-block to paste into. That's why pasting into the normal editor does nothing.
+**GoodLayers page builder** that ships with Kingster. Its `post_content` is empty — the
+layout lives in post meta — so there is no Gutenberg canvas and no Custom HTML block to
+paste into. That's why pasting into the normal editor does nothing.
 
-Use a **custom code element** in the builder instead. Everything below assumes that.
-
-## Which file to use
-
-| File | Use it when | Updates itself? |
-| --- | --- | --- |
-| `rcjq-in-the-media.html` | **Default** — paste into a custom code element | **Yes** — reads the site's own REST API on page load |
-| `rcjq-in-the-media-static.html` | The code element strips `<script>` | No — re-run the generator |
-| `rcjq-media-shortcode.php` | Only for someone with plugin or theme-file access | Yes — server-side, no JavaScript |
-
-Both HTML files are self-contained (markup + CSS, no external requests beyond the post
-images) and look identical. All CSS is namespaced under `.rcjq-media`, so nothing leaks
-into the Kingster theme or picks up styles from it.
-
-## Adding it via the custom code element
+Use the builder's **custom code element** instead:
 
 1. Edit the page with the GoodLayers builder and add a **custom code / HTML** element
    where the section should sit.
 2. Paste the entire contents of `rcjq-in-the-media.html`.
 3. Save and view the **front end** — not the builder preview, which won't run the fetch.
 
-If the section header appears but no cards ever load, the `<script>` was stripped: swap
-in `rcjq-in-the-media-static.html`, which needs no JavaScript.
-
 Avoid opening the content in a TinyMCE **Visual** tab afterwards — it rewrites `<script>`
-and `<style>`. Stay in the code/Text view.
-
-## The PHP shortcode (needs access you may not have)
-
-`rcjq-media-shortcode.php` renders the same section server-side with `WP_Query` — no
-JavaScript, no REST request, nothing for an editor to strip. It's the most robust
-option, but installing it needs either plugin-upload or theme-file access:
-
-- **As a plugin:** upload to `wp-content/plugins/`, activate *RCJQ in the Media*.
-- **In the child theme:** paste the code into `kingster-child/functions.php`.
-
-Then put `[rcjq_media]` in a Text Box or code element. Attributes:
-
-```
-[rcjq_media category="87" limit="3" heading="In the press"]
-```
-
-Hand this to whoever administers the site if you'd rather not rely on the JavaScript
-version. The file's syntax is verified, but it has not been run against a live
-WordPress install.
-
-## A no-code alternative worth knowing about
-
-The **SA** and **VIC** challenge-region pages already use the builder's own native
-**Blog grid** item to list their region's posts. You could add the same item to the QLD
-page, point it at the QLD category, and get a self-updating post grid with no code at
-all — styled by the theme rather than to match the landing page. Less control over the
-design, but nothing to maintain and no chance of markup being stripped.
+and `<style>`. Stay in the code view.
 
 ## Configuring it
 
-Everything adjustable lives in the `CONFIG` block near the bottom of
-`rcjq-in-the-media.html` (constants at the top of `generate-static.mjs`, shortcode
-attributes for the PHP):
+The `CONFIG` block near the bottom of `rcjq-in-the-media.html`:
 
 | Setting | Default | Notes |
 | --- | --- | --- |
-| `category` | `80` | `80` = QLD. Use `87` to show only posts filed under **In The Media** — that category currently has no posts assigned. |
+| `base` | the Pages URL | Feed location, and what image paths resolve against. Keep the trailing slash. |
+| `feed` | `data/social-posts.json` | Path to the feed under `base`. |
 | `limit` | `6` | Number of cards. |
-| `exclude` | `[20692]` | Post IDs to skip. `20692` is *RoboCup Junior Queensland Sumo Competition* — an evergreen challenge page rather than news. |
-| `archive` | `/category/qld/` | Target of the "See every Queensland post" link. |
+| `platforms` | all three | Trim to e.g. `["instagram"]` to show one platform. |
 
-Category IDs come from `/wp-json/wp/v2/categories?per_page=100`.
+## If the code element strips `<script>`
 
-## Regenerating the derived files
+Run the generator to bake the current posts into a static, JavaScript-free copy:
 
 ```bash
 node wordpress/generate-static.mjs
 ```
 
-Needs Node 18+. `rcjq-in-the-media.html` is the single hand-edited source of the CSS;
-this script rewrites `rcjq-in-the-media-static.html` with the current posts and injects
-the same CSS into `rcjq-media-shortcode.php` between its `RCJQ-CSS` markers, so the
-three versions can't drift apart. It refuses to write an empty block if the API
-returns nothing.
+It writes `rcjq-in-the-media-static.html`, reading the same feed and reusing the
+`<style>` block from `rcjq-in-the-media.html` so the two look identical. It refuses to
+run while the feed is still empty, so there is no static file in the repo yet — generate
+it once the workflow has published some posts.
 
-## How the HTML versions get the posts
+## Removed
 
-```
-/wp-json/wp/v2/posts?categories=80&per_page=10&orderby=date&order=desc
-    &_embed=wp:featuredmedia&_fields=id,date,link,title,excerpt,categories,_links,_embedded
-```
-
-Public, read-only, no authentication — the block only ever sees published posts, and
-fetches with `credentials: "omit"`. Post titles and excerpts are decoded to plain text
-and then re-escaped before being written to the page.
+`rcjq-media-shortcode.php` rendered this section from **WordPress** posts via `WP_Query`.
+The section now shows social posts instead, so it no longer applies — recover it from git
+history if it's ever useful. A PHP version reading the social feed would need
+`wp_remote_get` plus a transient cache, and installing it would still need the plugin or
+theme-file access that isn't available.
