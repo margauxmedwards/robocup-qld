@@ -735,6 +735,75 @@
         .feature .resource-body strong { font-size: 1.25rem; }
         .resource-pages.single { grid-template-columns: 1fr; }
 
+        /* ---------- Mailing list band ---------- */
+        .signup-band {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-top: 14px;
+            padding: clamp(20px, 2.6vw, 30px) clamp(20px, 3vw, 34px);
+            border-radius: 16px;
+            background: var(--green);
+            color: var(--navy);
+            text-decoration: none;
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .signup-band:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(0, 0, 0, 0.38); }
+
+        .signup-ico, .contact-ico {
+            flex-shrink: 0;
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(25, 47, 89, 0.12);
+        }
+
+        .signup-ico svg, .contact-ico svg { width: 34px; height: 34px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+        .signup-txt, .contact-txt { flex: 1; min-width: 0; }
+        .signup-kicker, .contact-label { display: block; font-size: 0.78rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; opacity: 0.75; }
+        .signup-txt strong { display: block; font-size: clamp(1.35rem, 2.4vw, 1.9rem); font-weight: 800; line-height: 1.15; margin: 3px 0 5px; }
+        .signup-txt > span:last-child { display: block; font-size: 1rem; line-height: 1.5; }
+        .signup-band .btn { flex-shrink: 0; }
+
+        /* ---------- Contact card ---------- */
+        .contact-card {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin: 14px auto 0;
+            max-width: 880px;
+            padding: clamp(20px, 2.6vw, 28px) clamp(20px, 3vw, 32px);
+            border-radius: 16px;
+            background: var(--card);
+            color: var(--navy);
+            text-align: left;
+            text-decoration: none;
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3);
+            transition: transform 0.15s ease;
+        }
+
+        .contact-card:hover { transform: translateY(-2px); }
+        .contact-card .contact-ico { background: rgba(157, 189, 56, 0.2); color: var(--green-dark); }
+        .contact-txt strong { display: block; font-size: clamp(1.2rem, 2.4vw, 1.75rem); font-weight: 800; margin: 3px 0 4px; overflow-wrap: anywhere; }
+        .contact-txt > span:last-child { display: block; font-size: 0.95rem; color: var(--muted); }
+        .contact-card .btn { flex-shrink: 0; }
+
+        .follow-head { margin: 38px 0 6px; font-size: 1.25rem; font-weight: 800; color: #fff; }
+
+        .hero-contact { margin: 14px 0 0; font-size: 0.95rem; color: var(--muted); }
+        .hero-contact a { color: var(--navy); font-weight: 700; }
+
+        @media (max-width: 700px) {
+            .signup-band, .contact-card { flex-direction: column; align-items: flex-start; text-align: left; }
+            .signup-band .btn, .contact-card .btn { align-self: stretch; text-align: center; }
+        }
+
         /* ---------- Socials / footer ---------- */
         .socials {
             display: grid;
@@ -811,9 +880,11 @@
                 25 years in Queensland. Open to all schools, primary and secondary, beginner friendly.
             </p>
             <div class="hero-actions">
+                <a class="btn lg green" href="https://mailchi.mp/robocupjunior/htymhq5v1u" target="_blank" rel="noopener">Join the mailing list</a>
                 <a class="btn lg" href="https://rcja.my.canva.site/queensland-impact-report" target="_blank" rel="noopener">Read the 25-year impact report</a>
-                <a class="btn lg green" href="flyer/rcjq-flyer.pdf" target="_blank" rel="noopener">Download the flyer</a>
+                <a class="btn lg secondary" href="flyer/rcjq-flyer.pdf" target="_blank" rel="noopener">Download the flyer</a>
             </div>
+            <p class="hero-contact">Questions? Email <a href="mailto:qld@robocupjunior.org.au">qld@robocupjunior.org.au</a></p>
         </div>
     </header>
 
@@ -857,6 +928,17 @@
         </div>
     </div>
 
+    <!-- ============ MAILING LIST ============ -->
+    <a class="signup-band" id="mailing-list" href="https://mailchi.mp/robocupjunior/htymhq5v1u" target="_blank" rel="noopener">
+        <span class="signup-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg></span>
+        <span class="signup-txt">
+            <span class="signup-kicker">Stay in the loop</span>
+            <strong>Join the RCJQ mailing list</strong>
+            <span>Be the first to hear about upcoming events, workshops, resources and volunteer opportunities.</span>
+        </span>
+        <span class="btn lg">Sign up →</span>
+    </a>
+
     <div class="photostrip">
         <img src="photostrip.jpg" alt="Students building and competing with robots at RoboCup Junior Queensland events">
     </div>
@@ -880,11 +962,11 @@
         <h2>Everything in one place</h2>
         <p class="sub">Whether you're a student, teacher, parent or future volunteer — start here.</p>
         <nav class="links">
-            <a class="link-btn primary" href="https://forms.cloud.microsoft/pages/responsepage.aspx?id=uTxxKsDrzk29b_HiSUcnPKm_GQCvWPNMqwn9lNNYh3lUNFMzRzdIQkZERFhIMVA5TVFEWlFOWkcxVC4u&route=shorturl" target="_blank" rel="noopener">
-                <span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+            <a class="link-btn primary" href="https://mailchi.mp/robocupjunior/htymhq5v1u" target="_blank" rel="noopener">
+                <span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg></span>
                 <span class="txt">
-                    <strong>Volunteer with us</strong>
-                    <span>Referees, judges and event helpers — no robotics experience required</span>
+                    <strong>Join the mailing list</strong>
+                    <span>Hear about upcoming events, workshops, resources and volunteer opportunities</span>
                 </span>
                 <span class="arrow">→</span>
             </a>
@@ -933,14 +1015,6 @@
                 <span class="txt">
                     <strong>Sync events to your calendar</strong>
                     <span>Subscribe once and never miss a registration deadline</span>
-                </span>
-                <span class="arrow">→</span>
-            </a>
-            <a class="link-btn" href="https://mailchi.mp/robocupjunior/htymhq5v1u" target="_blank" rel="noopener">
-                <span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg></span>
-                <span class="txt">
-                    <strong>Join the mailing list</strong>
-                    <span>Season news and event announcements in your inbox</span>
                 </span>
                 <span class="arrow">→</span>
             </a>
@@ -1109,7 +1183,17 @@
     <!-- ============ CONTACT ============ -->
     <section class="section" id="contact" style="text-align: center;">
         <span class="kicker">Contact</span>
-        <h2>Follow RCJQ</h2>
+        <h2>Get in touch</h2>
+        <a class="contact-card" href="mailto:qld@robocupjunior.org.au">
+            <span class="contact-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg></span>
+            <span class="contact-txt">
+                <span class="contact-label">Contact us</span>
+                <strong>qld@robocupjunior.org.au</strong>
+                <span>Questions about events, registrations, workshops or volunteering</span>
+            </span>
+            <span class="btn lg green">Email us →</span>
+        </a>
+        <h3 class="follow-head">Follow RCJQ</h3>
         <p class="sub" style="margin: 0 auto 4px;">Photos, results and announcements from every event, as they happen.</p>
         <div class="socials">
             <a class="social facebook" href="https://www.facebook.com/RoboCupJuniorQld/" target="_blank" rel="noopener" aria-label="RoboCup Junior QLD on Facebook">
@@ -1128,9 +1212,7 @@
                 <span class="social-go" aria-hidden="true">Follow →</span>
             </a>
         </div>
-        <p class="contact">
-            Enquiries: <a href="mailto:qld@robocupjunior.org.au">qld@robocupjunior.org.au</a>
-        </p>
+
     </section>
 
     <footer>
