@@ -3,7 +3,7 @@
 A linktree-style hub for anyone wanting to discover RoboCup Junior in Queensland:
 what it is, upcoming events, volunteering, team registration and the events calendar.
 
-**Live site:** https://margauxmedwards.github.io/robocup-qld/
+**Live site:** https://rcjqld.github.io/
 
 ## How it works
 
