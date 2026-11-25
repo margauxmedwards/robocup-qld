@@ -410,7 +410,7 @@
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
         }
 
-        .entry-banner .tag {
+        .tag {
             display: inline-block;
             background: var(--green);
             color: var(--navy);
@@ -454,8 +454,20 @@
 
         .entry-banner .learn-more { color: var(--green-bright); }
 
+        /* Sumo banner with a photo on the right. */
+        .entry-banner.has-photo { padding: 0; gap: 0; align-items: stretch; overflow: hidden; }
+        .entry-banner.has-photo > div { padding: 20px 22px; flex: 1; }
+        .banner-photo { width: 42%; flex-shrink: 0; object-fit: cover; display: block; }
+
+        /* Challenge cards with a photo header. */
+        .challenge.has-photo { padding: 0; overflow: hidden; }
+        .challenge-photo { display: block; width: 100%; aspect-ratio: 3 / 2; height: auto; object-fit: cover; transition: transform 0.3s ease; }
+        .challenge.has-photo:hover .challenge-photo { transform: scale(1.04); }
+        .challenge-body { padding: 16px 18px 18px; }
+
         @media (max-width: 560px) {
             .entry-banner { flex-direction: column; gap: 8px; }
+            .banner-photo { width: 100%; aspect-ratio: 16 / 9; order: -1; }
         }
 
         .chips {
@@ -573,6 +585,7 @@
         /* ---------- Photo mosaic ---------- */
         .mosaic {
             display: grid;
+            grid-auto-flow: dense;
             grid-template-columns: repeat(4, 1fr);
             grid-auto-rows: clamp(120px, 14vw, 210px);
             gap: 10px;
@@ -663,29 +676,96 @@
 
         .btn:hover { transform: translateY(-1px); }
         .btn.secondary { background: rgba(25, 47, 89, 0.08); color: var(--navy); }
+        .btn.green { background: var(--green); color: var(--navy); }
+        .btn.lg { padding: 12px 20px; font-size: 0.95rem; }
+
+        .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+
+        @media (max-width: 560px) {
+            .hero-actions { justify-content: center; }
+        }
+
+        /* ---------- 25 years feature ---------- */
+        .feature {
+            display: grid;
+            grid-template-columns: 3fr 2fr;
+            gap: 14px;
+            margin-top: 26px;
+        }
+
+        @media (max-width: 900px) {
+            .feature { grid-template-columns: 1fr; }
+        }
+
+        .impact-banner {
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            min-height: clamp(320px, 34vw, 460px);
+            border-radius: 16px;
+            overflow: hidden;
+            color: #fff;
+            text-decoration: none;
+            background: var(--navy);
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3);
+        }
+
+        .impact-banner img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .impact-banner:hover img { transform: scale(1.03); }
+
+        .impact-banner::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(16, 31, 61, 0) 25%, rgba(16, 31, 61, 0.94) 100%);
+        }
+
+        .impact-banner .inner { position: relative; z-index: 1; padding: clamp(20px, 3vw, 34px); }
+        .impact-banner h3 { margin: 10px 0 8px; font-size: clamp(1.5rem, 2.6vw, 2.2rem); font-weight: 800; line-height: 1.15; }
+        .impact-banner p { margin: 0 0 16px; color: rgba(255, 255, 255, 0.88); max-width: 54ch; line-height: 1.55; }
+
+        .feature .resource-body strong { font-size: 1.25rem; }
+        .resource-pages.single { grid-template-columns: 1fr; }
 
         /* ---------- Socials / footer ---------- */
         .socials {
-            display: flex;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
             gap: 14px;
-            margin-top: 4px;
+            margin-top: 14px;
+            text-align: left;
         }
 
-        .socials a {
-            width: 46px;
-            height: 46px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        .social {
             display: flex;
             align-items: center;
-            justify-content: center;
-            transition: background 0.15s ease, transform 0.15s ease;
+            gap: 16px;
+            padding: 20px 22px;
+            border-radius: 16px;
+            color: #fff;
+            text-decoration: none;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
 
-        .socials a:hover { background: rgba(157, 189, 56, 0.3); transform: translateY(-2px); }
-        .socials svg { width: 21px; height: 21px; fill: #fff; }
+        .social:hover { transform: translateY(-3px); box-shadow: 0 10px 26px rgba(0, 0, 0, 0.4); }
+        .social.facebook { background: #1877f2; }
+        .social.instagram { background: linear-gradient(135deg, #f58529, #dd2a7b 50%, #8134af); }
+        .social.linkedin { background: #0a66c2; }
+
+        .social svg { width: 44px; height: 44px; fill: #fff; flex-shrink: 0; }
+        .social-txt { min-width: 0; }
+        .social-txt strong { display: block; font-size: 1.25rem; font-weight: 800; line-height: 1.2; }
+        .social-txt span { display: block; font-size: 0.9rem; opacity: 0.9; overflow-wrap: anywhere; }
+        .social-go { margin-left: auto; font-size: 0.85rem; font-weight: 700; white-space: nowrap; opacity: 0.9; }
 
         .contact {
             text-align: center;
@@ -730,6 +810,10 @@
                 build and program fully autonomous robots to solve real-world challenges — celebrating
                 25 years in Queensland. Open to all schools, primary and secondary, beginner friendly.
             </p>
+            <div class="hero-actions">
+                <a class="btn lg" href="https://rcja.my.canva.site/queensland-impact-report" target="_blank" rel="noopener">Read the 25-year impact report</a>
+                <a class="btn lg green" href="flyer/rcjq-flyer-2026.pdf" target="_blank" rel="noopener">Download the 2026 flyer</a>
+            </div>
         </div>
     </header>
 
@@ -740,6 +824,37 @@
         <div class="stat"><span class="num">1:3</span><span class="lbl">female QLD participation</span></div>
         <div class="stat"><span class="num">500+</span><span class="lbl">STEM educators &amp; teachers</span></div>
         <div class="stat"><span class="num">7,000+</span><span class="lbl">students Australia-wide</span></div>
+    </div>
+
+    <!-- ============ 25 YEARS: IMPACT REPORT + FLYER ============ -->
+    <div class="feature" id="resources">
+        <a class="impact-banner" href="https://rcja.my.canva.site/queensland-impact-report" target="_blank" rel="noopener">
+            <img src="photos/states-2026-celebration-stage.jpg" width="1599" height="1066"
+                 alt="Students gathered in front of the RCJQ25 balloons and trophies at the 2026 State Championships">
+            <div class="inner">
+                <span class="tag">Celebrating 25 years in Queensland</span>
+                <h3>Queensland impact report</h3>
+                <p>RoboCup Junior Australia's report celebrating 25 years of RoboCup Junior in Queensland, with photos from the 2026 State Championships.</p>
+                <span class="btn green lg">Read the report →</span>
+            </div>
+        </a>
+        <div class="resource">
+            <div class="resource-pages single">
+                <a href="flyer/rcjq-flyer-2026-p1.jpg" target="_blank" rel="noopener">
+                    <img src="flyer/rcjq-flyer-2026-p1.jpg" width="1600" height="1131"
+                         alt="RCJQ 2026 flyer, front: key figures, the four challenges and who can take part">
+                </a>
+            </div>
+            <div class="resource-body">
+                <strong>2026 RCJQ flyer</strong>
+                <p>Print it for your school noticeboard or share it with teachers. Tap the page to view it full size.</p>
+                <div class="resource-actions">
+                    <a class="btn" href="flyer/rcjq-flyer-2026.pdf" download>Download PDF</a>
+                    <a class="btn secondary" href="flyer/rcjq-flyer-2026.pdf" target="_blank" rel="noopener">Open PDF</a>
+                    <a class="btn secondary" href="flyer/rcjq-flyer-2026-p2.jpg" target="_blank" rel="noopener">View back page</a>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="photostrip">
@@ -887,7 +1002,7 @@
         <h2>Pick your arena</h2>
         <p class="sub">Four consistent challenges, from first-time teams through to advanced robotics.</p>
 
-        <a class="entry-banner" href="https://www.robocupjunior.org.au/rcjq-sumo/" target="_blank" rel="noopener">
+        <a class="entry-banner has-photo" href="https://www.robocupjunior.org.au/rcjq-sumo/" target="_blank" rel="noopener">
             <div>
                 <span class="tag">Start here · Queensland entry challenge</span>
                 <strong class="name">Sumo</strong>
@@ -898,28 +1013,41 @@
                 </p>
                 <span class="learn-more">Explore RCJQ Sumo →</span>
             </div>
+            <img class="banner-photo" src="photos/states-2026-sumo-rings.jpg" loading="lazy" alt="Round sumo rings set up at the 2026 State Championships">
         </a>
 
         <div class="challenges">
-            <a class="challenge" href="https://www.robocupjunior.org.au/soccer/" target="_blank" rel="noopener">
-                <strong>Soccer</strong>
-                <span>Design autonomous robots that compete in fast-paced robot soccer matches.</span>
-                <span class="learn-more">Learn more →</span>
+            <a class="challenge has-photo" href="https://www.robocupjunior.org.au/soccer/" target="_blank" rel="noopener">
+                <img class="challenge-photo" src="photos/states-2026-soccer-crowd.jpg" loading="lazy" width="1600" height="1041" alt="Students watching their robots play a soccer match">
+                <div class="challenge-body">
+                    <strong>Soccer</strong>
+                    <span>Design autonomous robots that compete in fast-paced robot soccer matches.</span>
+                    <span class="learn-more">Learn more →</span>
+                </div>
             </a>
-            <a class="challenge" href="https://www.robocupjunior.org.au/rescue-line/" target="_blank" rel="noopener">
-                <strong>Rescue Line</strong>
-                <span>Program a robot to follow a complex path and deliver aid to victims in a simulated disaster environment.</span>
-                <span class="learn-more">Learn more →</span>
+            <a class="challenge has-photo" href="https://www.robocupjunior.org.au/rescue-line/" target="_blank" rel="noopener">
+                <img class="challenge-photo" src="photos/states-2026-rescue-line.jpg" loading="lazy" width="1600" height="1041" alt="A line-following robot climbing the ramp on a Rescue Line course">
+                <div class="challenge-body">
+                    <strong>Rescue Line</strong>
+                    <span>Program a robot to follow a complex path and deliver aid to victims in a simulated disaster environment.</span>
+                    <span class="learn-more">Learn more →</span>
+                </div>
             </a>
-            <a class="challenge" href="https://www.robocupjunior.org.au/rescue-maze/" target="_blank" rel="noopener">
-                <strong>Rescue Maze</strong>
-                <span>Build a fully autonomous robot capable of navigating a maze and locating victims.</span>
-                <span class="learn-more">Learn more →</span>
+            <a class="challenge has-photo" href="https://www.robocupjunior.org.au/rescue-maze/" target="_blank" rel="noopener">
+                <img class="challenge-photo" src="photos/states-2026-rescue-maze.jpg" loading="lazy" width="1600" height="1067" alt="A student placing their robot into the Rescue Maze">
+                <div class="challenge-body">
+                    <strong>Rescue Maze</strong>
+                    <span>Build a fully autonomous robot capable of navigating a maze and locating victims.</span>
+                    <span class="learn-more">Learn more →</span>
+                </div>
             </a>
-            <a class="challenge" href="https://www.robocupjunior.org.au/onstage/" target="_blank" rel="noopener">
-                <strong>OnStage</strong>
-                <span>Combine robotics, creativity and storytelling in a robot-assisted performance.</span>
-                <span class="learn-more">Learn more →</span>
+            <a class="challenge has-photo" href="https://www.robocupjunior.org.au/onstage/" target="_blank" rel="noopener">
+                <img class="challenge-photo" src="photos/states-2026-onstage.jpg" loading="lazy" width="1600" height="1117" alt="Costumed OnStage robots dressed as princesses, ready to perform">
+                <div class="challenge-body">
+                    <strong>OnStage</strong>
+                    <span>Combine robotics, creativity and storytelling in a robot-assisted performance.</span>
+                    <span class="learn-more">Learn more →</span>
+                </div>
             </a>
         </div>
 
@@ -930,59 +1058,6 @@
             <span class="chip">No specific robots required</span>
             <span class="chip">Low cost of entry</span>
         </div>
-    </section>
-
-    <!-- ============ FLYER & IMPACT REPORT ============ -->
-    <section class="section" id="resources">
-        <span class="kicker">Share RCJQ</span>
-        <h2>Flyer &amp; impact report</h2>
-        <p class="sub">Print the flyer for your school noticeboard, or read how 25 years of RoboCup Junior has grown across Queensland.</p>
-        <div class="resources">
-            <div class="resource">
-                <div class="resource-pages">
-                    <a href="flyer/rcjq-flyer-2026-p1.jpg" target="_blank" rel="noopener">
-                        <img src="flyer/rcjq-flyer-2026-p1.jpg" loading="lazy" width="1600" height="1131"
-                             alt="RCJQ 2026 flyer, front: key figures, the four challenges and who can take part">
-                    </a>
-                    <a href="flyer/rcjq-flyer-2026-p2.jpg" target="_blank" rel="noopener">
-                        <img src="flyer/rcjq-flyer-2026-p2.jpg" loading="lazy" width="1600" height="1131"
-                             alt="RCJQ 2026 flyer, back: what RoboCup is, why schools join, and the challenge descriptions">
-                    </a>
-                </div>
-                <div class="resource-body">
-                    <strong>2026 RCJQ flyer</strong>
-                    <p>Two A4 pages: who can enter, the challenges, and how schools get started. Tap a page to view it full size.</p>
-                    <div class="resource-actions">
-                        <a class="btn" href="flyer/rcjq-flyer-2026.pdf" download>Download PDF</a>
-                        <a class="btn secondary" href="flyer/rcjq-flyer-2026.pdf" target="_blank" rel="noopener">Open in browser</a>
-                    </div>
-                </div>
-            </div>
-            <div class="resource">
-                <img class="resource-cover" src="photos/states-2026-volunteers.jpg" loading="lazy" width="1600" height="1002"
-                     alt="RCJQ volunteers in red shirts at the 2026 State Championships, celebrating 25 years">
-                <div class="resource-body">
-                    <strong>Queensland impact report</strong>
-                    <p>RoboCup Junior Australia's report celebrating 25 years of RoboCup Junior in Queensland, with photos from the 2026 State Championships.</p>
-                    <div class="resource-actions">
-                        <a class="btn" href="https://rcja.my.canva.site/queensland-impact-report" target="_blank" rel="noopener">Read the report</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ============ IN THE MEDIA ============ -->
-    <section class="section" id="media">
-        <span class="kicker">Latest updates</span>
-        <h2>RCJQ in the media</h2>
-        <p class="sub">Photos, results and announcements as they go up on our Facebook, Instagram and LinkedIn.</p>
-        <div class="media-grid" id="media-grid">
-            <div class="events-note">Loading the latest posts…</div>
-        </div>
-        <a class="see-all" href="https://www.instagram.com/robocupjunior.qld/" target="_blank" rel="noopener">
-            Follow @robocupjunior.qld for everything as it happens →
-        </a>
     </section>
 
     <!-- ============ PHOTO GALLERIES ============ -->
@@ -999,6 +1074,11 @@
             <a href="photos/states-2026-25th-cake.jpg" target="_blank" rel="noopener"><img src="photos/states-2026-25th-cake.jpg" loading="lazy" alt="The cake celebrating 25 years of RoboCup Junior Queensland"></a>
             <a class="wide" href="photos/states-2026-soccer-match.jpg" target="_blank" rel="noopener"><img src="photos/states-2026-soccer-match.jpg" loading="lazy" alt="Robots mid-match on a soccer field"></a>
             <a class="wide" href="photos/states-2026-tracked-robot.jpg" target="_blank" rel="noopener"><img src="photos/states-2026-tracked-robot.jpg" loading="lazy" alt="Students gathered around a large tracked robot in the UQ workshop"></a>
+            <a href="photos/states-2026-floor-coding.jpg" target="_blank" rel="noopener"><img src="photos/states-2026-floor-coding.jpg" loading="lazy" alt="Two students coding their robot on the floor between rounds"></a>
+            <a href="photos/states-2026-robot-dog.jpg" target="_blank" rel="noopener"><img src="photos/states-2026-robot-dog.jpg" loading="lazy" alt="Children meeting a four-legged robot dog"></a>
+            <a class="wide tall" href="photos/states-2026-presenter.jpg" target="_blank" rel="noopener"><img src="photos/states-2026-presenter.jpg" loading="lazy" alt="A volunteer speaking to the crowd in front of the RCJQ25 balloons and trophies"></a>
+            <a href="photos/states-2026-mat-challenge.jpg" target="_blank" rel="noopener"><img src="photos/states-2026-mat-challenge.jpg" loading="lazy" alt="Students and families watching a robot run on a challenge mat"></a>
+            <a href="photos/states-2026-cake-cutting.jpg" target="_blank" rel="noopener"><img src="photos/states-2026-cake-cutting.jpg" loading="lazy" alt="Volunteers and guests gathered around the 25th anniversary cake"></a>
         </div>
         <p class="photo-credit">2026 State Championships at the University of Queensland · photos from the RCJA Queensland impact report.</p>
 
@@ -1029,16 +1109,23 @@
     <!-- ============ CONTACT ============ -->
     <section class="section" id="contact" style="text-align: center;">
         <span class="kicker">Contact</span>
-        <h2>Get in touch</h2>
+        <h2>Follow RCJQ</h2>
+        <p class="sub" style="margin: 0 auto 4px;">Photos, results and announcements from every event, as they happen.</p>
         <div class="socials">
-            <a href="https://www.facebook.com/RoboCupJuniorQld/" target="_blank" rel="noopener" aria-label="RoboCup Junior QLD on Facebook">
+            <a class="social facebook" href="https://www.facebook.com/RoboCupJuniorQld/" target="_blank" rel="noopener" aria-label="RoboCup Junior QLD on Facebook">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5.02 3.66 9.18 8.44 9.94v-7.03H7.9v-2.9h2.54V9.85c0-2.52 1.5-3.91 3.78-3.91 1.09 0 2.24.2 2.24.2v2.47H15.2c-1.24 0-1.63.77-1.63 1.57v1.88h2.78l-.45 2.9h-2.33V22c4.78-.76 8.43-4.92 8.43-9.94Z"/></svg>
+                <span class="social-txt"><strong>Facebook</strong><span>RoboCupJuniorQld</span></span>
+                <span class="social-go" aria-hidden="true">Follow →</span>
             </a>
-            <a href="https://www.instagram.com/robocupjunior.qld/" target="_blank" rel="noopener" aria-label="RoboCup Junior QLD on Instagram">
+            <a class="social instagram" href="https://www.instagram.com/robocupjunior.qld/" target="_blank" rel="noopener" aria-label="RoboCup Junior QLD on Instagram">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.72 3.72 0 0 1-1.38-.9c-.42-.42-.68-.82-.9-1.38-.16-.42-.36-1.06-.41-2.23-.06-1.27-.07-1.65-.07-4.85s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41 1.27-.06 1.65-.07 4.85-.07M12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63a5.88 5.88 0 0 0-2.13 1.38A5.88 5.88 0 0 0 .63 4.14C.33 4.9.13 5.78.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.15.56 2.91.3.79.72 1.46 1.38 2.13a5.88 5.88 0 0 0 2.13 1.38c.76.3 1.64.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.27-.06 2.15-.26 2.91-.56a5.88 5.88 0 0 0 2.13-1.38 5.88 5.88 0 0 0 1.38-2.13c.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.15-.56-2.91a5.88 5.88 0 0 0-1.38-2.13A5.88 5.88 0 0 0 19.86.63c-.76-.3-1.64-.5-2.91-.56C15.67.01 15.26 0 12 0Zm0 5.84A6.16 6.16 0 1 0 18.16 12 6.16 6.16 0 0 0 12 5.84ZM12 16a4 4 0 1 1 4-4 4 4 0 0 1-4 4Zm7.85-10.4a1.44 1.44 0 1 1-1.44-1.44 1.44 1.44 0 0 1 1.44 1.44Z"/></svg>
+                <span class="social-txt"><strong>Instagram</strong><span>@robocupjunior.qld</span></span>
+                <span class="social-go" aria-hidden="true">Follow →</span>
             </a>
-            <a href="https://www.linkedin.com/company/robocupjuniorqld" target="_blank" rel="noopener" aria-label="RoboCup Junior QLD on LinkedIn">
+            <a class="social linkedin" href="https://www.linkedin.com/company/robocupjuniorqld" target="_blank" rel="noopener" aria-label="RoboCup Junior QLD on LinkedIn">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.42v1.56h.05a3.75 3.75 0 0 1 3.37-1.85c3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13Zm1.78 13.02H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.72v20.55C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.72C24 .77 23.2 0 22.22 0Z"/></svg>
+                <span class="social-txt"><strong>LinkedIn</strong><span>RoboCup Junior Queensland</span></span>
+                <span class="social-go" aria-hidden="true">Follow →</span>
             </a>
         </div>
         <p class="contact">
@@ -1166,87 +1253,6 @@
         .catch(err => {
             console.error("Event feed failed:", err);
             showFallback();
-        });
-
-    // ---------------------------------------------------------------------
-    // RCJQ in the media — posts from the RCJQ Facebook, Instagram and
-    // LinkedIn accounts. Read from data/social-posts.json, which the
-    // "Refresh social feed" GitHub Action rebuilds daily; none of these
-    // platforms can be read from the browser without a token.
-    // ---------------------------------------------------------------------
-    const SOCIAL_FEED = "data/social-posts.json";
-    const MAX_SOCIAL = 6;
-
-    const PLATFORMS = {
-        facebook: { label: "Facebook", url: "https://www.facebook.com/RoboCupJuniorQld/" },
-        instagram: { label: "Instagram", url: "https://www.instagram.com/robocupjunior.qld/" },
-        linkedin: { label: "LinkedIn", url: "https://www.linkedin.com/company/robocupjuniorqld" }
-    };
-
-    // Captions run long and carry hashtag blocks; keep the first few lines.
-    function captionText(text) {
-        return String(text || "")
-            .split("\n")
-            .map(line => line.trim())
-            .filter(line => line && !/^#/.test(line))
-            .join(" ")
-            .replace(/\s+/g, " ")
-            .trim();
-    }
-
-    function socialThumb(post) {
-        if (!post.image) {
-            const label = (PLATFORMS[post.platform] || {}).label || "RCJQ";
-            return `<span class="media-thumb empty" aria-hidden="true">${esc(label)}</span>`;
-        }
-        return `<img class="media-thumb" src="${esc(post.image)}"
-            alt="${esc(captionText(post.text).slice(0, 90) || "RCJQ social post")}"
-            loading="lazy" decoding="async">`;
-    }
-
-    function socialFallback(profiles) {
-        const links = Object.keys(PLATFORMS).map(key => {
-            const url = (profiles && profiles[key]) || PLATFORMS[key].url;
-            return `<a href="${esc(url)}" target="_blank" rel="noopener">${PLATFORMS[key].label}</a>`;
-        }).join(" · ");
-        return `<div class="events-note">Latest posts are on ${links}.</div>`;
-    }
-
-    function renderSocial(feed) {
-        const grid = document.getElementById("media-grid");
-        const posts = (feed && Array.isArray(feed.posts) ? feed.posts : []).slice(0, MAX_SOCIAL);
-
-        if (!posts.length) {
-            grid.innerHTML = socialFallback(feed && feed.profiles);
-            return;
-        }
-
-        grid.innerHTML = posts.map(post => {
-            const platform = PLATFORMS[post.platform] || { label: "RCJQ" };
-            const caption = captionText(post.text);
-            const date = new Date(post.date).toLocaleDateString("en-AU", {
-                day: "numeric", month: "short", year: "numeric"
-            });
-            return `
-                <a class="media-card" href="${esc(post.url)}" target="_blank" rel="noopener">
-                    ${socialThumb(post)}
-                    <span class="media-body">
-                        <span class="media-meta">
-                            <span class="media-date">${esc(date)}</span>
-                            <span class="pill ${esc(post.platform)}">${esc(platform.label)}</span>
-                        </span>
-                        ${caption ? `<span class="media-excerpt">${esc(caption)}</span>` : ""}
-                    </span>
-                </a>`;
-        }).join("");
-    }
-
-    fetch(SOCIAL_FEED, { cache: "no-cache" })
-        .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
-        .then(renderSocial)
-        .catch(err => {
-            console.error("Social feed failed:", err);
-            document.getElementById("media-grid").innerHTML = socialFallback(null);
         });
 </script>
 </body>
