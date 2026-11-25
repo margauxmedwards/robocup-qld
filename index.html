@@ -104,9 +104,13 @@
         /* ---------- Stats ---------- */
         .stats {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(6, 1fr);
             gap: 12px;
             margin-top: 14px;
+        }
+
+        @media (max-width: 900px) {
+            .stats { grid-template-columns: repeat(3, 1fr); }
         }
 
         @media (max-width: 620px) {
@@ -566,6 +570,100 @@
         .pill.instagram { background: #fdeaf2; color: #b3247c; }
         .pill.linkedin { background: #e4f1f8; color: #0a5c86; }
 
+        /* ---------- Photo mosaic ---------- */
+        .mosaic {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-auto-rows: clamp(120px, 14vw, 210px);
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .mosaic a {
+            display: block;
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+        }
+
+        .mosaic img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .mosaic a:hover img { transform: scale(1.04); }
+        .mosaic .wide { grid-column: span 2; }
+        .mosaic .tall { grid-row: span 2; }
+
+        @media (max-width: 620px) {
+            .mosaic { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 130px; }
+        }
+
+        .photo-credit {
+            margin: 0 0 18px;
+            font-size: 0.82rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* ---------- Flyer & impact report ---------- */
+        .resources {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr));
+            gap: 14px;
+        }
+
+        .resource {
+            display: flex;
+            flex-direction: column;
+            background: var(--card);
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+        }
+
+        .resource-pages {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            padding: 12px 12px 0;
+        }
+
+        .resource-pages a { display: block; border-radius: 8px; overflow: hidden; border: 1px solid #e3e7ec; }
+        .resource-pages img { display: block; width: 100%; height: auto; transition: transform 0.2s ease; }
+        .resource-pages a:hover img { transform: scale(1.03); }
+
+        .resource-cover {
+            display: block;
+            aspect-ratio: 16 / 9;
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+        }
+
+        .resource-body { padding: 16px 18px 18px; display: flex; flex-direction: column; flex: 1; }
+        .resource-body strong { display: block; font-size: 1.08rem; font-weight: 800; color: var(--navy); margin-bottom: 5px; }
+        .resource-body p { margin: 0 0 14px; font-size: 0.9rem; line-height: 1.6; color: var(--muted); }
+
+        .resource-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; }
+
+        .btn {
+            display: inline-block;
+            padding: 9px 16px;
+            border-radius: 999px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            text-decoration: none;
+            background: var(--navy);
+            color: #fff;
+            transition: transform 0.15s ease;
+        }
+
+        .btn:hover { transform: translateY(-1px); }
+        .btn.secondary { background: rgba(25, 47, 89, 0.08); color: var(--navy); }
+
         /* ---------- Socials / footer ---------- */
         .socials {
             display: flex;
@@ -639,6 +737,8 @@
         <div class="stat"><span class="num">25</span><span class="lbl">years of RoboCup in Queensland</span></div>
         <div class="stat"><span class="num">1,000+</span><span class="lbl">Queensland students each year</span></div>
         <div class="stat"><span class="num">65%</span><span class="lbl">regional or rural QLD schools</span></div>
+        <div class="stat"><span class="num">1:3</span><span class="lbl">female QLD participation</span></div>
+        <div class="stat"><span class="num">500+</span><span class="lbl">STEM educators &amp; teachers</span></div>
         <div class="stat"><span class="num">5,000+</span><span class="lbl">students Australia-wide</span></div>
     </div>
 
@@ -697,11 +797,19 @@
                 </span>
                 <span class="arrow">→</span>
             </a>
-            <a class="link-btn" href="https://www.robocupjunior.org.au/wp-content/uploads/2026/03/RCJQ-2026-RoboCup-Flyer-4.pdf" target="_blank" rel="noopener">
+            <a class="link-btn" href="flyer/rcjq-flyer-2026.pdf" target="_blank" rel="noopener">
                 <span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="12" x2="12" y2="18"/><polyline points="9 15 12 18 15 15"/></svg></span>
                 <span class="txt">
                     <strong>2026 RCJQ flyer</strong>
                     <span>Download the official flyer to print or share with your school (PDF)</span>
+                </span>
+                <span class="arrow">→</span>
+            </a>
+            <a class="link-btn" href="https://rcja.my.canva.site/queensland-impact-report" target="_blank" rel="noopener">
+                <span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+                <span class="txt">
+                    <strong>Queensland impact report</strong>
+                    <span>RoboCup Junior Australia's report on 25 years in Queensland</span>
                 </span>
                 <span class="arrow">→</span>
             </a>
@@ -824,6 +932,46 @@
         </div>
     </section>
 
+    <!-- ============ FLYER & IMPACT REPORT ============ -->
+    <section class="section" id="resources">
+        <span class="kicker">Share RCJQ</span>
+        <h2>Flyer &amp; impact report</h2>
+        <p class="sub">Print the flyer for your school noticeboard, or read how 25 years of RoboCup Junior has grown across Queensland.</p>
+        <div class="resources">
+            <div class="resource">
+                <div class="resource-pages">
+                    <a href="flyer/rcjq-flyer-2026-p1.jpg" target="_blank" rel="noopener">
+                        <img src="flyer/rcjq-flyer-2026-p1.jpg" loading="lazy" width="1600" height="1131"
+                             alt="RCJQ 2026 flyer, front: key figures, the four challenges and who can take part">
+                    </a>
+                    <a href="flyer/rcjq-flyer-2026-p2.jpg" target="_blank" rel="noopener">
+                        <img src="flyer/rcjq-flyer-2026-p2.jpg" loading="lazy" width="1600" height="1131"
+                             alt="RCJQ 2026 flyer, back: what RoboCup is, why schools join, and the challenge descriptions">
+                    </a>
+                </div>
+                <div class="resource-body">
+                    <strong>2026 RCJQ flyer</strong>
+                    <p>Two A4 pages: who can enter, the challenges, and how schools get started. Tap a page to view it full size.</p>
+                    <div class="resource-actions">
+                        <a class="btn" href="flyer/rcjq-flyer-2026.pdf" download>Download PDF</a>
+                        <a class="btn secondary" href="flyer/rcjq-flyer-2026.pdf" target="_blank" rel="noopener">Open in browser</a>
+                    </div>
+                </div>
+            </div>
+            <div class="resource">
+                <img class="resource-cover" src="photos/states-2026-volunteers.jpg" loading="lazy" width="1600" height="1002"
+                     alt="RCJQ volunteers in red shirts at the 2026 State Championships, celebrating 25 years">
+                <div class="resource-body">
+                    <strong>Queensland impact report</strong>
+                    <p>RoboCup Junior Australia's report celebrating 25 years of RoboCup Junior in Queensland, with photos from the 2026 State Championships.</p>
+                    <div class="resource-actions">
+                        <a class="btn" href="https://rcja.my.canva.site/queensland-impact-report" target="_blank" rel="noopener">Read the report</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- ============ IN THE MEDIA ============ -->
     <section class="section" id="media">
         <span class="kicker">Latest updates</span>
@@ -842,6 +990,17 @@
         <span class="kicker">Photo galleries</span>
         <h2>2026 event photos</h2>
         <p class="sub">Official galleries from this season's competitions, shot by the photographers who were there.</p>
+
+        <div class="mosaic">
+            <a class="wide tall" href="photos/states-2026-soccer-judging.jpg" target="_blank" rel="noopener"><img src="photos/states-2026-soccer-judging.jpg" loading="lazy" alt="Students and referees around a robot soccer field at the 2026 State Championships"></a>
+            <a href="photos/states-2026-mentor-tablet.jpg" target="_blank" rel="noopener"><img src="photos/states-2026-mentor-tablet.jpg" loading="lazy" alt="Young students programming their robot on a tablet with a mentor"></a>
+            <a href="photos/states-2026-steam-team.jpg" target="_blank" rel="noopener"><img src="photos/states-2026-steam-team.jpg" loading="lazy" alt="A girls' STEAM team chatting with a volunteer"></a>
+            <a href="photos/states-2026-rescue-maze.jpg" target="_blank" rel="noopener"><img src="photos/states-2026-rescue-maze.jpg" loading="lazy" alt="A student placing their robot into the Rescue Maze"></a>
+            <a href="photos/states-2026-25th-cake.jpg" target="_blank" rel="noopener"><img src="photos/states-2026-25th-cake.jpg" loading="lazy" alt="The cake celebrating 25 years of RoboCup Junior Queensland"></a>
+            <a class="wide" href="photos/states-2026-soccer-match.jpg" target="_blank" rel="noopener"><img src="photos/states-2026-soccer-match.jpg" loading="lazy" alt="Robots mid-match on a soccer field"></a>
+            <a class="wide" href="photos/states-2026-tracked-robot.jpg" target="_blank" rel="noopener"><img src="photos/states-2026-tracked-robot.jpg" loading="lazy" alt="Students gathered around a large tracked robot in the UQ workshop"></a>
+        </div>
+        <p class="photo-credit">2026 State Championships at the University of Queensland · photos from the RCJA Queensland impact report.</p>
 
         <div class="challenges">
             <a class="challenge" href="https://haardshahphotography.pixieset.com/robocupjuniorqueenslandregionals/" target="_blank" rel="noopener">
