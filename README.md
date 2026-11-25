@@ -10,8 +10,8 @@ what it is, upcoming events, volunteering, team registration and the events cale
 - Single static `index.html`, deployed via GitHub Pages from the `main` branch root.
   There is no build step for the page itself.
 - Upcoming events are fetched client-side from the daily-refreshed feeds published by
-  [rcja-calendar](https://github.com/margauxmedwards/rcja-calendar)
-  (`.../rcja-calendar/data/qld-events.json` + `nat-events.json`, deduplicated by event id).
+  [RCJQ calendar](https://rcjqld.github.io/calendar/)
+  (`https://rcjqld.github.io/calendar/data/qld-events.json` + `nat-events.json`, deduplicated by event id).
 - The "RCJQ in the media" section reads `data/social-posts.json`, rebuilt daily by the
   **Refresh social feed** workflow — see below.
 - Branding (navy `#192f59` / green `#9dbd38`, hero image) matches the calendar site.
@@ -61,7 +61,7 @@ above variables you have set in your environment.
 
 ## Key links wired into the page
 
-- QLD events calendar: https://margauxmedwards.github.io/rcja-calendar/QLD/
+- QLD events calendar: https://rcjqld.github.io/calendar/
 - Volunteer form (Microsoft Forms) — see the "Volunteer with us" button in `index.html`
 - Team registration: https://enter.robocupjunior.org.au/
 - Mailing list: https://mailchi.mp/robocupjunior/htymhq5v1u
